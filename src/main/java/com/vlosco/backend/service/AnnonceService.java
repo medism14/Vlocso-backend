@@ -232,23 +232,19 @@ public class AnnonceService {
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
 
-            // Vérification que l'ID de l'annonce correspond
-            if (!id.equals(annonceUpdateDTO.getAnnonce().getAnnonceId())) {
-                response.setMessage("L'ID de l'annonce ne correspond pas à l'ID fourni");
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
-
             // Mise à jour du véhicule uniquement si des informations sont fournies
             if (annonceUpdateDTO.getVehicle() != null) {
                 ResponseEntity<ResponseDTO<Vehicle>> vehicleResponse = vehicleService
-                        .updateVehicle(existingAnnonce.get().getVehicle().getVehicleId(), annonceUpdateDTO.getVehicle());
+                        .updateVehicle(existingAnnonce.get().getVehicle().getVehicleId(),
+                                annonceUpdateDTO.getVehicle());
                 if (vehicleResponse.getStatusCode() != HttpStatus.OK) {
                     response.setMessage("Le véhicule spécifié n'a pas pu être mis à jour");
                     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
                 }
             }
 
-            // Mise à jour des champs de l'annonce uniquement si des informations sont fournies
+            // Mise à jour des champs de l'annonce uniquement si des informations sont
+            // fournies
             Annonce annonce = existingAnnonce.get();
             AnnonceDetailsUpdateDTO annonceDetails = annonceUpdateDTO.getAnnonce();
 
@@ -271,7 +267,10 @@ public class AnnonceService {
                 annonce.setPhoneNumber(annonceDetails.getPhoneNumber());
             }
 
-            annonce.setVendor(existingAnnonce.get().getVendor()); // Conserver le vendeur existant
+            if (annonceDetails.getAnnonceState() != null) {
+                annonce.setAnnonceState(annonceDetails.getAnnonceState());
+            }
+
             annonce.setUpdatedAt(LocalDateTime.now());
 
             Annonce savedAnnonce = annonceRepository.save(annonce);
