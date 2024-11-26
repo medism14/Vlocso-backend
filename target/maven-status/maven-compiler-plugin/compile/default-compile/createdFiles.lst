@@ -57,7 +57,6 @@ com/vlosco/backend/model/PaymentPremium.class
 com/vlosco/backend/dto/AnnonceWithUserDTO.class
 com/vlosco/backend/repository/NotificationRepository.class
 com/vlosco/backend/dto/UserLoginDTO.class
-com/vlosco/backend/dto/ProviderNames.class
 com/vlosco/backend/repository/InteractionRepository.class
 com/vlosco/backend/model/Image.class
 com/vlosco/backend/dto/AnnonceCreationDTO.class
@@ -77,8 +76,6 @@ com/vlosco/backend/service/PaymentPremiumService.class
 com/vlosco/backend/dto/UserUpdateDTO.class
 com/vlosco/backend/dto/ResponseDTO.class
 com/vlosco/backend/dto/CreateAuthProviderDTO.class
-com/vlosco/backend/dto/UserType.class
-com/vlosco/backend/dto/UserRole.class
 com/vlosco/backend/dto/AnnonceDetailsUpdateDTO.class
 com/vlosco/backend/service/JwtService.class
 com/vlosco/backend/service/VehicleService.class

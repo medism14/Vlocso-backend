@@ -25,7 +25,6 @@
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/MessageResponseDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/MessageUpdateDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/PremiumAnnonceDTO.java
-/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/ProviderNames.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/RefreshTokenDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/ResponseDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/TokenDTO.java
@@ -35,12 +34,14 @@
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/UserLoginProviderDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/UserRegistrationDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/UserRegistrationProviderDTO.java
-/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/UserRole.java
-/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/UserType.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/UserUpdateDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/UserUpdatePasswordDto.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/VehicleCreationDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/VehicleUpdateDTO.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/enums/AnnonceState.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/enums/ProviderNames.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/enums/UserRole.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/enums/UserType.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/model/Annonce.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/model/AuthProvider.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/model/Conversation.java
