@@ -9,6 +9,8 @@ import com.vlosco.backend.enums.AnnonceState;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -45,6 +47,7 @@ public class Annonce {
     @Column(name = "transaction", nullable = false)
     private String transaction;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "annonce_state", nullable = false)
     private AnnonceState annonceState;
 
