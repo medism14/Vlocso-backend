@@ -82,7 +82,7 @@ public class Annonce {
     private List<Interaction> interactions;
 
     @OneToMany(mappedBy = "annonce")
-    @JsonManagedReference
+    @JsonBackReference
     private List<Conversation> conversations;
 
     @OneToMany(mappedBy = "annonce")

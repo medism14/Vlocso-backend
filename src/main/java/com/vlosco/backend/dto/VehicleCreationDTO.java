@@ -1,34 +1,47 @@
 package com.vlosco.backend.dto;
 
 import jakarta.validation.constraints.NotNull;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "DTO pour la création d'un véhicule")
 public class VehicleCreationDTO {
+    
     @NotNull
+    @Schema(description = "Type de véhicule", example = "Voiture")
     private String type;
 
     @NotNull
+    @Schema(description = "Marque du véhicule", example = "Toyota")
     private String mark;
 
     @NotNull
+    @Schema(description = "Modèle du véhicule", example = "Corolla")
     private String model;
 
     @NotNull
+    @Schema(description = "Année de fabrication", example = "2020")
     private Integer year;
 
     @NotNull
+    @Schema(description = "Type de boîte de vitesses", example = "Manuelle")
     private String gearbox;
 
     @NotNull
+    @Schema(description = "Indique si le véhicule a la climatisation", example = "Oui")
     private String climatisation;
 
     @NotNull
+    @Schema(description = "État du véhicule", example = "Neuf")
     private String condition;
 
     @NotNull
+    @Schema(description = "Type de carburant", example = "Essence")
     private String fuelType;
 
+    @Schema(description = "Compteur kilométrique", example = "15000")
     private String klm_counter;
 
+    @Schema(description = "Description du véhicule", example = "Véhicule en excellent état")
     private String description;
 
     public String getType() {
