@@ -5,8 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.vlosco.backend.dto.UserRole;
-import com.vlosco.backend.dto.UserType;
+import com.vlosco.backend.enums.UserRole;
+import com.vlosco.backend.enums.UserType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

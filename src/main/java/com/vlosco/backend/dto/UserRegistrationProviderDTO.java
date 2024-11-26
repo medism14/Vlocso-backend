@@ -2,6 +2,9 @@ package com.vlosco.backend.dto;
 
 import java.time.LocalDate;
 
+import com.vlosco.backend.enums.ProviderNames;
+import com.vlosco.backend.enums.UserRole;
+
 import jakarta.validation.constraints.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 

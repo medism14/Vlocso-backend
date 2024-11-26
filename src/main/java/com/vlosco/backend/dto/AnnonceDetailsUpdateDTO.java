@@ -1,6 +1,9 @@
 package com.vlosco.backend.dto;
 
 import jakarta.validation.constraints.NotNull;
+
+import com.vlosco.backend.enums.AnnonceState;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "DTO pour la mise à jour des détails d'une annonce")
@@ -27,6 +30,9 @@ public class AnnonceDetailsUpdateDTO {
 
     @Schema(description = "Numéro de téléphone de contact", example = "+33123456789")
     private String phoneNumber;
+
+    @Schema(description = "État de l'annonce", example = "ACTIVe")
+    private AnnonceState annonceState;
 
     public Long getAnnonceId() {
         return annonceId;
@@ -82,5 +88,13 @@ public class AnnonceDetailsUpdateDTO {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public AnnonceState getAnnonceState() {
+        return annonceState;
+    }
+
+    public void setAnnonceState(AnnonceState annonceState) {
+        this.annonceState = annonceState;
     }
 }

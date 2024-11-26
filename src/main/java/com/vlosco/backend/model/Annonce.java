@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.vlosco.backend.enums.AnnonceState;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -45,7 +46,7 @@ public class Annonce {
     private String transaction;
 
     @Column(name = "annonce_state", nullable = false)
-    private String annonceState;
+    private AnnonceState annonceState;
 
     @Column(name = "country", nullable = false)
     private String country;
@@ -167,11 +168,11 @@ public class Annonce {
         this.transaction = transaction;
     }
 
-    public String getAnnonceState() {
+    public AnnonceState getAnnonceState() {
         return annonceState;
     }
 
-    public void setAnnonceState(String annonceState) {
+    public void setAnnonceState(AnnonceState annonceState) {
         this.annonceState = annonceState;
     }
 
