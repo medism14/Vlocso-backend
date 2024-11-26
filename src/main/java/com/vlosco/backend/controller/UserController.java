@@ -26,7 +26,7 @@ import java.util.List;
  * Contrôleur REST gérant toutes les opérations liées aux utilisateurs.
  * Fournit des endpoints pour la gestion des comptes, l'authentification et les mises à jour.
  */
-@Tag(name = "User Management", description = "Endpoints pour la gestion des utilisateurs")
+@Tag(name = "Users", description = "Endpoints pour la gestion des utilisateurs")
 @RestController
 @RequestMapping("/users")
 @CrossOrigin(origins = "*")

@@ -28,7 +28,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     // Liste des chemins exclus de la vérification JWT (ex: endpoints d'authentification)
     // private static final List<String> EXCLUDED_PATHS = Arrays.asList("/auth/");
-    private static final List<String> EXCLUDED_PATHS = Arrays.asList("/auth", "/users", "/annonce", "/swagger-ui", "/providers", "/api-docs");
+    private static final List<String> EXCLUDED_PATHS = Arrays.asList("/auth", "/users", "/annonce", "/swagger-ui", "/api-docs", "/providers", "/conversations", "/messages");
 
     public JwtRequestFilter(JwtService jwtService) {
         this.jwtService = jwtService;

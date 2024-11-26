@@ -2,7 +2,9 @@
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/AnnonceController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/AuthController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/AuthProviderController.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/ConversationController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/ImageController.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/MessageController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/ProviderController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/UserController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/VehicleController.java
@@ -13,9 +15,15 @@
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/AnnonceUpdateDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/AnnonceWithUserDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/AuthResponse.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/ConversationCreationDTO.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/ConversationResponseDTO.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/ConversationUpdateDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/CreateAuthProviderDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/CreateProviderDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/JwtResponse.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/MessageCreationDTO.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/MessageResponseDTO.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/MessageUpdateDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/PremiumAnnonceDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/ProviderNames.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/RefreshTokenDTO.java
