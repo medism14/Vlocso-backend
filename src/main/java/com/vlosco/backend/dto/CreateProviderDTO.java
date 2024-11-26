@@ -1,5 +1,7 @@
 package com.vlosco.backend.dto;
 
+import com.vlosco.backend.enums.ProviderNames;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "DTO pour la création d'un fournisseur")

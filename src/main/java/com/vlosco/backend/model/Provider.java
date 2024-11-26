@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.vlosco.backend.dto.ProviderNames;
+import com.vlosco.backend.enums.ProviderNames;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

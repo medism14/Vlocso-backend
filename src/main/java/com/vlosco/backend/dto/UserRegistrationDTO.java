@@ -3,6 +3,9 @@ package com.vlosco.backend.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 
+import com.vlosco.backend.enums.UserRole;
+import com.vlosco.backend.enums.UserType;
+
 @Schema(description = "DTO pour l'enregistrement d'un utilisateur")
 public class UserRegistrationDTO {
     

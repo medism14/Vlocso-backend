@@ -16,6 +16,7 @@ import com.vlosco.backend.dto.AnnonceUpdateDTO;
 import com.vlosco.backend.dto.AnnonceWithUserDTO;
 import com.vlosco.backend.dto.PremiumAnnonceDTO;
 import com.vlosco.backend.dto.ResponseDTO;
+import com.vlosco.backend.enums.AnnonceState;
 import com.vlosco.backend.model.Annonce;
 import com.vlosco.backend.model.User;
 import com.vlosco.backend.model.Vehicle;
@@ -187,9 +188,9 @@ public class AnnonceService {
             annonce.setTransaction(annonceCreationDTO.getAnnonce().getTransaction());
             annonce.setCity(annonceCreationDTO.getAnnonce().getCity());
             annonce.setPhoneNumber(annonceCreationDTO.getAnnonce().getPhoneNumber());
-            annonce.setAnnonceState("ACTIVE"); // État par défaut
+            annonce.setAnnonceState(AnnonceState.ACTIVE);
             annonce.setVendor(user);
-            annonce.setVehicle(vehicle); // Associer le véhicule créé
+            annonce.setVehicle(vehicle);
 
             Annonce savedAnnonce = annonceRepository.save(annonce);
 
@@ -237,42 +238,40 @@ public class AnnonceService {
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
 
-            // Mise à jour du véhicule
-            ResponseEntity<ResponseDTO<Vehicle>> vehicleResponse = vehicleService
-                    .updateVehicle(existingAnnonce.get().getVehicle().getVehicleId(), annonceUpdateDTO.getVehicle());
-            if (vehicleResponse.getStatusCode() != HttpStatus.OK) {
-                response.setMessage("Le véhicule spécifié n'a pas pu être mis à jour");
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
-            ResponseDTO<Vehicle> vehicleResponseDto = vehicleResponse.getBody();
-            Vehicle vehicle;
-
-            if (vehicleResponseDto == null || vehicleResponseDto.getData() == null) {
-                response.setMessage("Le véhicule spécifié n'a pas pu être mis à jour");
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            } else {
-                vehicle = vehicleResponseDto.getData();
+            // Mise à jour du véhicule uniquement si des informations sont fournies
+            if (annonceUpdateDTO.getVehicle() != null) {
+                ResponseEntity<ResponseDTO<Vehicle>> vehicleResponse = vehicleService
+                        .updateVehicle(existingAnnonce.get().getVehicle().getVehicleId(), annonceUpdateDTO.getVehicle());
+                if (vehicleResponse.getStatusCode() != HttpStatus.OK) {
+                    response.setMessage("Le véhicule spécifié n'a pas pu être mis à jour");
+                    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+                }
             }
 
-            // Mise à jour des champs de l'annonce
+            // Mise à jour des champs de l'annonce uniquement si des informations sont fournies
             Annonce annonce = existingAnnonce.get();
             AnnonceDetailsUpdateDTO annonceDetails = annonceUpdateDTO.getAnnonce();
 
-            if (annonceDetails.getTitle() != null)
+            if (annonceDetails.getTitle() != null) {
                 annonce.setTitle(annonceDetails.getTitle());
-            if (annonceDetails.getPrice() != null)
+            }
+            if (annonceDetails.getPrice() != null) {
                 annonce.setPrice(annonceDetails.getPrice());
-            if (annonceDetails.getQuantity() != null)
+            }
+            if (annonceDetails.getQuantity() != null) {
                 annonce.setQuantity(annonceDetails.getQuantity());
-            if (annonceDetails.getTransaction() != null)
+            }
+            if (annonceDetails.getTransaction() != null) {
                 annonce.setTransaction(annonceDetails.getTransaction());
-            if (annonceDetails.getCity() != null)
+            }
+            if (annonceDetails.getCity() != null) {
                 annonce.setCity(annonceDetails.getCity());
-            if (annonceDetails.getPhoneNumber() != null)
+            }
+            if (annonceDetails.getPhoneNumber() != null) {
                 annonce.setPhoneNumber(annonceDetails.getPhoneNumber());
+            }
 
             annonce.setVendor(existingAnnonce.get().getVendor()); // Conserver le vendeur existant
-            annonce.setVehicle(vehicle); // Associer le véhicule mis à jour
             annonce.setUpdatedAt(LocalDateTime.now());
 
             Annonce savedAnnonce = annonceRepository.save(annonce);
@@ -467,15 +466,15 @@ public class AnnonceService {
         ResponseDTO<List<Annonce>> response = new ResponseDTO<>();
         try {
             Optional<List<Annonce>> filteredAnnonces = annonceRepository.filterAnnonces(
-                    vendorId, 
-                    premium, 
+                    vendorId,
+                    premium,
                     transaction,
-                    annonceState, 
-                    city, 
-                    minKilometrage, 
-                    maxKilometrage, 
-                    minPrice, 
-                    maxPrice, 
+                    annonceState,
+                    city,
+                    minKilometrage,
+                    maxKilometrage,
+                    minPrice,
+                    maxPrice,
                     marque);
 
             if (filteredAnnonces.isPresent() && filteredAnnonces.get().isEmpty()) {
