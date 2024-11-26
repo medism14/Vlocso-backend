@@ -1,7 +1,5 @@
 package com.vlosco.backend.dto;
 
-import jakarta.validation.constraints.NotNull;
-
 import com.vlosco.backend.enums.AnnonceState;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,10 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "DTO pour la mise à jour des détails d'une annonce")
 public class AnnonceDetailsUpdateDTO {
     
-    @NotNull
-    @Schema(description = "Identifiant de l'annonce", required = true, example = "1")
-    private Long annonceId;
-
     @Schema(description = "Titre de l'annonce", example = "Vente d'une voiture")
     private String title;
 
@@ -33,14 +27,6 @@ public class AnnonceDetailsUpdateDTO {
 
     @Schema(description = "État de l'annonce", example = "ACTIVe")
     private AnnonceState annonceState;
-
-    public Long getAnnonceId() {
-        return annonceId;
-    }
-
-    public void setAnnonceId(Long annonceId) {
-        this.annonceId = annonceId;
-    }
 
     public String getTitle() {
         return title;
