@@ -92,7 +92,7 @@ public class AnnonceController {
             @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
     })
     @PostMapping
-    public ResponseEntity<ResponseDTO<Annonce>> createAnnonce(
+    public ResponseEntity<ResponseDTO<AnnonceWithUserDTO>> createAnnonce(
             @Parameter(description = "Détails de l'annonce à créer") @RequestBody AnnonceCreationDTO annonce) {
         return annonceService.createAnnonce(annonce);
     }
