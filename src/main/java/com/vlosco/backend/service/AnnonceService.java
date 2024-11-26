@@ -152,8 +152,8 @@ public class AnnonceService {
      *         - 400 BAD_REQUEST: Si le véhicule spécifié n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
-    public ResponseEntity<ResponseDTO<Annonce>> createAnnonce(AnnonceCreationDTO annonceCreationDTO) {
-        ResponseDTO<Annonce> response = new ResponseDTO<>();
+    public ResponseEntity<ResponseDTO<AnnonceWithUserDTO>> createAnnonce(AnnonceCreationDTO annonceCreationDTO) {
+        ResponseDTO<AnnonceWithUserDTO> response = new ResponseDTO<>();
         try {
             // Création du véhicule
             ResponseEntity<ResponseDTO<Vehicle>> vehicleResponse = vehicleService
@@ -199,9 +199,10 @@ public class AnnonceService {
                 imageService.saveImage(imageUrl, savedAnnonce.getAnnonceId());
             }
 
-            // Réponse
+            // Réponse avec AnnonceWithUserDTO
+            AnnonceWithUserDTO annonceWithUserDTO = new AnnonceWithUserDTO(savedAnnonce, user);
             response.setMessage("L'annonce a été créée avec succès");
-            response.setData(savedAnnonce);
+            response.setData(annonceWithUserDTO);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();
