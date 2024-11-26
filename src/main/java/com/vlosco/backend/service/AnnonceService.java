@@ -223,8 +223,8 @@ public class AnnonceService {
      *         - 404 NOT_FOUND: Si l'annonce à modifier n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
-    public ResponseEntity<ResponseDTO<Annonce>> updateAnnonce(Long id, AnnonceUpdateDTO annonceUpdateDTO) {
-        ResponseDTO<Annonce> response = new ResponseDTO<>();
+    public ResponseEntity<ResponseDTO<AnnonceWithUserDTO>> updateAnnonce(Long id, AnnonceUpdateDTO annonceUpdateDTO) {
+        ResponseDTO<AnnonceWithUserDTO> response = new ResponseDTO<>();
         try {
             // Vérification de l'existence de l'annonce
             Optional<Annonce> existingAnnonce = annonceRepository.findById(id);
@@ -244,8 +244,7 @@ public class AnnonceService {
                 }
             }
 
-            // Mise à jour des champs de l'annonce uniquement si des informations sont
-            // fournies
+            // Mise à jour des champs de l'annonce uniquement si des informations sont fournies
             Annonce annonce = existingAnnonce.get();
             AnnonceDetailsUpdateDTO annonceDetails = annonceUpdateDTO.getAnnonce();
 
@@ -284,8 +283,12 @@ public class AnnonceService {
                 }
             }
 
+            // Récupération de l'utilisateur associé à l'annonce
+            User user = savedAnnonce.getVendor();
+            AnnonceWithUserDTO annonceWithUserDTO = new AnnonceWithUserDTO(savedAnnonce, user);
+
             response.setMessage("L'annonce a été mise à jour avec succès");
-            response.setData(savedAnnonce);
+            response.setData(annonceWithUserDTO);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();

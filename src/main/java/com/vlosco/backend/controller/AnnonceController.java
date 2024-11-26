@@ -105,7 +105,7 @@ public class AnnonceController {
             @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseDTO<Annonce>> updateAnnonce(
+    public ResponseEntity<ResponseDTO<AnnonceWithUserDTO>> updateAnnonce(
             @Parameter(description = "ID de l'annonce à modifier") @PathVariable Long id,
             @Parameter(description = "Nouvelles informations de l'annonce") @RequestBody AnnonceUpdateDTO annonce) {
         return annonceService.updateAnnonce(id, annonce);
