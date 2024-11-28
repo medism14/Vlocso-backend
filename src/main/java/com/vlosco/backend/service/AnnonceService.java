@@ -244,7 +244,8 @@ public class AnnonceService {
                 }
             }
 
-            // Mise à jour des champs de l'annonce uniquement si des informations sont fournies
+            // Mise à jour des champs de l'annonce uniquement si des informations sont
+            // fournies
             Annonce annonce = existingAnnonce.get();
             AnnonceDetailsUpdateDTO annonceDetails = annonceUpdateDTO.getAnnonce();
 
