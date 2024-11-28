@@ -115,8 +115,8 @@ public class VehicleService {
             vehicle.setFuelType(vehicleDto.getFuelType());
             vehicle.setKlmCounter(vehicleDto.getKlm_counter());
             vehicle.setDescription(vehicleDto.getDescription());
-            vehicle.setType(vehicleDto.getType()); // Ajout du type
-            vehicle.setCondition(vehicleDto.getCondition()); // Ajout de la condition
+            vehicle.setType(vehicleDto.getType());
+            vehicle.setCondition(vehicleDto.getCondition());
 
             // Initialisation des timestamps de création et mise à jour
             Vehicle savedVehicle = vehicleRepository.save(vehicle);

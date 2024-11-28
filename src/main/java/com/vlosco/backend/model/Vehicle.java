@@ -23,13 +23,13 @@ public class Vehicle {
 
     @Column(name = "type", nullable = false)
     private String type;
-    
+
     @Column(name = "mark", nullable = false)
     private String mark;
 
     @Column(name = "model", nullable = false)
     private String model;
-    
+
     @Column(name = "year", nullable = false)
     private Integer year;
 
@@ -44,19 +44,19 @@ public class Vehicle {
 
     @Column(name = "condition", nullable = false)
     private String condition;
-    
+
     @Column(name = "climatisation", nullable = false)
     private String climatisation;
 
-    @Column(name = "description", nullable = true)
+    @Column(name = "description", nullable = true, length = 18000)
     private String description;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
-    
+
     @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
-    
+
     @OneToOne(mappedBy = "vehicle")
     @JsonBackReference
     private Annonce annonce;
