@@ -45,6 +45,12 @@ public class Vehicle {
     @Column(name = "condition", nullable = false)
     private String condition;
 
+    @Column(name = "category", nullable = false)
+    private String category;
+
+    @Column(name = "color", nullable = false)
+    private String color;
+
     @Column(name = "climatisation", nullable = false)
     private String climatisation;
 
@@ -179,5 +185,22 @@ public class Vehicle {
 
     public void setAnnonce(Annonce annonce) {
         this.annonce = annonce;
+    }
+
+    // Getters et Setters pour category et color
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }
