@@ -25,7 +25,7 @@ public class Interaction {
     @Column(name = "interaction_type", nullable = false)
     private String interactionType;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = true)
     private String content;
 
     @ManyToOne

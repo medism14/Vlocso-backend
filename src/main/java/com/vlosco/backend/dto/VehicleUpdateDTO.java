@@ -29,6 +29,12 @@ public class VehicleUpdateDTO {
     @Schema(description = "État du véhicule", example = "Neuf")
     private String condition;
 
+    @Schema(description = "Catégorie du véhicule", example = "Citadine")
+    private String category;
+
+    @Schema(description = "Couleur du véhicule", example = "Rouge")
+    private String color;
+
     @Schema(description = "Compteur kilométrique", example = "15000")
     private String klm_counter;
 
@@ -113,5 +119,21 @@ public class VehicleUpdateDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }

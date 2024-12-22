@@ -1,6 +1,9 @@
 package com.vlosco.backend.dto;
 
 import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
@@ -20,7 +23,7 @@ public class AnnonceCreationDTO {
 
     @NotNull
     @Schema(description = "Tableau d'URLs des images associées à l'annonce", required = true, example = "[\"http://example.com/image1.jpg\", \"http://example.com/image2.jpg\"]")
-    private String[] images;
+    private List<String> images;
 
     @Schema(description = "Obtenir les détails de l'annonce")
     public AnnonceDetailsCreationDTO getAnnonce() {
@@ -43,12 +46,12 @@ public class AnnonceCreationDTO {
     }
 
     @Schema(description = "Obtenir les URLs des images associées à l'annonce")
-    public String[] getImages() {
+    public List<String> getImages() {
         return images;
     }
 
     @Schema(description = "Définir les URLs des images associées à l'annonce")
-    public void setImages(String[] images) {
+    public void setImages(List<String> images) {
         this.images = images;
     }
 }

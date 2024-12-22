@@ -117,6 +117,8 @@ public class VehicleService {
             vehicle.setDescription(vehicleDto.getDescription());
             vehicle.setType(vehicleDto.getType());
             vehicle.setCondition(vehicleDto.getCondition());
+            vehicle.setCategory(vehicleDto.getCategory());
+            vehicle.setColor(vehicleDto.getColor());
 
             // Initialisation des timestamps de création et mise à jour
             Vehicle savedVehicle = vehicleRepository.save(vehicle);
@@ -167,6 +169,10 @@ public class VehicleService {
                     vehicle.setClimatisation(updatedVehicle.getClimatisation());
                 if (updatedVehicle.getDescription() != null)
                     vehicle.setDescription(updatedVehicle.getDescription());
+                if (updatedVehicle.getCategory() != null)
+                    vehicle.setCategory(updatedVehicle.getCategory());
+                if (updatedVehicle.getColor() != null)
+                    vehicle.setColor(updatedVehicle.getColor());
                 vehicle.setType(vehicle.getType());
                 vehicle.setCondition(updatedVehicle.getCondition());
                 vehicle.setUpdatedAt(LocalDateTime.now());
