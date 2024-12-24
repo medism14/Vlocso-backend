@@ -27,7 +27,7 @@ public class Conversation {
 
     @ManyToOne
     @JoinColumn(name = "annonce_id", nullable = false)
-    @JsonManagedReference
+    @JsonBackReference
     private Annonce annonce;
 
     @ManyToOne
@@ -45,7 +45,7 @@ public class Conversation {
     private boolean isActiveForBuyer;
 
     @OneToMany(mappedBy = "conversation")
-    @JsonManagedReference
+    @JsonBackReference
     private List<Message> messages;
 
 

@@ -3,7 +3,7 @@ package com.vlosco.backend.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.vlosco.backend.enums.ProviderNames;
 
 import jakarta.persistence.CascadeType;
@@ -34,7 +34,7 @@ public class Provider {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonBackReference
     private List<AuthProvider> authProviders;
 
     public Long getProviderId() {

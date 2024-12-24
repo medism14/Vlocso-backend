@@ -35,13 +35,13 @@ public class Notification {
     private Boolean global;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    @JsonBackReference
+    @JoinColumn(name = "user_id")
+    @JsonBackReference("user-notifications")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "annonce_id", nullable = false)
-    @JsonBackReference
+    @JoinColumn(name = "annonce_id")
+    @JsonBackReference("annonce-notifications")
     private Annonce annonce;
 
     @Column(name = "expiration_date", nullable = true)

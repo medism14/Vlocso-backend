@@ -1,23 +1,34 @@
 package com.vlosco.backend.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import com.vlosco.backend.dto.AnnonceCreationDTO;
 import com.vlosco.backend.dto.AnnonceDetailsUpdateDTO;
 import com.vlosco.backend.dto.AnnonceUpdateDTO;
 import com.vlosco.backend.dto.AnnonceWithUserDTO;
 import com.vlosco.backend.dto.PremiumAnnonceDTO;
+import com.vlosco.backend.dto.RecommandationUserNeedData;
 import com.vlosco.backend.dto.ResponseDTO;
 import com.vlosco.backend.enums.AnnonceState;
 import com.vlosco.backend.model.Annonce;
+import com.vlosco.backend.model.Interaction;
 import com.vlosco.backend.model.User;
 import com.vlosco.backend.model.Vehicle;
 import com.vlosco.backend.repository.AnnonceRepository;
@@ -34,16 +45,22 @@ import com.vlosco.backend.repository.UserRepository;
 public class AnnonceService {
 
     private final AnnonceRepository annonceRepository;
+    private final RestTemplate restTemplate;
+
     private final VehicleService vehicleService;
+    private final InteractionService interactionService;
     private final UserRepository userRepository;
     private final ImageService imageService;
 
     public AnnonceService(AnnonceRepository annonceRepository, VehicleService vehicleService,
-            UserRepository userRepository, ImageService imageService) {
+            UserRepository userRepository, ImageService imageService, RestTemplate restTemplate,
+            InteractionService interactionService) {
         this.annonceRepository = annonceRepository;
         this.vehicleService = vehicleService;
         this.userRepository = userRepository;
         this.imageService = imageService;
+        this.restTemplate = restTemplate;
+        this.interactionService = interactionService;
     }
 
     /**
@@ -104,6 +121,90 @@ public class AnnonceService {
         } catch (Exception e) {
             e.printStackTrace();
             response.setMessage("Une erreur est survenue lors de la récupération de l'annonce");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Récupérer les recommandations qui pourrait être faite pour un utilisateur
+     * 
+     * @param userId ID de l'utilisateur
+     * @param type   Type de véhicule ("Voiture", "Moto" ou null pour général)
+     * @return ResponseEntity contenant la liste des annonces recommandées
+     */
+    public ResponseEntity<ResponseDTO<List<Annonce>>> recommandationUser(Long userId, String type) {
+        ResponseDTO<List<Annonce>> response = new ResponseDTO<>();
+        try {
+            // Vérifier le nombre total d'annonces
+            long totalAnnonces = annonceRepository.count();
+            if (totalAnnonces < 100) {
+                List<Annonce> randomAnnonces;
+                if (!"General".equals(type)) {
+                    randomAnnonces = annonceRepository.findByVehicleType(type);
+                } else {
+                    randomAnnonces = annonceRepository.findAll();
+                }
+                Collections.shuffle(randomAnnonces);
+                response.setData(randomAnnonces.stream().limit(12).collect(Collectors.toList()));
+                response.setMessage("Recommandations aléatoires récupérées avec succès");
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            }
+
+            // Configuration de l'en-tête pour spécifier le type de contenu JSON
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+            // Sélection de l'endpoint selon le type
+            String endpoint = "http://localhost:8000/recommend/";
+            if ("Voiture".equals(type)) {
+                endpoint += "cars/";
+            } else if ("Moto".equals(type)) {
+                endpoint += "motos/";
+            } else if ("General".equals(type)) {
+                endpoint += "general/";
+            }
+            endpoint += userId;
+
+            // Appel à l'API de recommandation
+            ResponseEntity<List<Integer>> responseEntity = restTemplate.exchange(
+                    endpoint,
+                    HttpMethod.POST,
+                    requestEntity,
+                    new ParameterizedTypeReference<List<Integer>>() {
+                    });
+
+            // Convertir les IDs en annonces
+            List<Annonce> recommendedAnnonces = new ArrayList<>();
+            List<Integer> annonceIds = responseEntity.getBody();
+
+            if (annonceIds != null && !annonceIds.isEmpty()) {
+                for (Integer annonceId : annonceIds) {
+                    Optional<Annonce> annonceOpt = annonceRepository.findById(annonceId.longValue());
+                    annonceOpt.ifPresent(recommendedAnnonces::add);
+                }
+                response.setMessage("Recommandations récupérées avec succès");
+            } else {
+                // Si la liste est vide, retourner 12 annonces au hasard
+                List<Annonce> allAnnonces = annonceRepository.findAll();
+                Collections.shuffle(allAnnonces);
+                recommendedAnnonces = allAnnonces.stream()
+                        .limit(12)
+                        .collect(Collectors.toList());
+                response.setMessage("Recommandation vide, annonces aléatoires récupérées avec succès");
+            }
+
+            response.setData(recommendedAnnonces);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (RestClientException e) {
+            e.printStackTrace();
+            response.setMessage("Erreur lors de la communication avec le service de recommandation: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.SERVICE_UNAVAILABLE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage(
+                    "Une erreur est survenue lors de la récupération des recommandations: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

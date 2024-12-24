@@ -37,6 +37,9 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
     @Query(value = "SELECT * FROM annonces WHERE id = :id AND premium = true", nativeQuery = true)
     Optional<Annonce> findPremiumAnnonceById(@Param("id") Long id);
 
+    @Query(value = "SELECT a.* FROM annonces a JOIN vehicles v ON a.vehicle_id = v.vehicle_id WHERE v.type = :type", nativeQuery = true)
+    List<Annonce> findByVehicleType(@Param("type") String type);
+
     /**
      * Récupère les détails d'une annonce spécifique.
      * 

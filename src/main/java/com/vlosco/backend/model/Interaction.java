@@ -29,13 +29,13 @@ public class Interaction {
     private String content;
 
     @ManyToOne
-    @JoinColumn(name = "annonce_id", nullable = false)
-    @JsonBackReference
+    @JoinColumn(name = "annonce_id")
+    @JsonBackReference("annonce-interactions")
     private Annonce annonce;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    @JsonBackReference
+    @JoinColumn(name = "user_id")
+    @JsonBackReference("user-interactions")
     private User user;
 
     @Column(name = "created_at", nullable = false)

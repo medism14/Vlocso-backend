@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.vlosco.backend.enums.UserRole;
 import com.vlosco.backend.enums.UserType;
@@ -94,35 +95,35 @@ public class User {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "vendor")
-    @JsonManagedReference
+    @JsonManagedReference("user-annonces")
     private List<Annonce> annonces;
 
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
+    @JsonManagedReference("user-interactions")
     private List<Interaction> interactions;
 
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
+    @JsonManagedReference("user-notifications")
     private List<Notification> notifications;
 
     @OneToMany(mappedBy = "buyer")
-    @JsonManagedReference
+    @JsonBackReference
     private List<Conversation> conversations;
 
     @OneToMany(mappedBy = "sender")
-    @JsonManagedReference
+    @JsonBackReference
     private List<Message> messagesSent;
 
     @OneToMany(mappedBy = "receiver")
-    @JsonManagedReference
+    @JsonBackReference
     private List<Message> messagesReceived;
 
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
+    @JsonBackReference
     private List<AuthProvider> authProviders;
 
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
+    @JsonBackReference
     private List<RefreshTokensBlacklist> refreshTokensBlacklist;
 
     @PrePersist
