@@ -70,7 +70,7 @@ public class Annonce {
 
     @ManyToOne
     @JoinColumn(name = "vendor_id", nullable = false)
-    @JsonBackReference
+    @JsonBackReference("user-annonces")
     private User vendor;
 
     @OneToMany(mappedBy = "annonce")
@@ -78,19 +78,15 @@ public class Annonce {
     private List<Image> images;
 
     @OneToMany(mappedBy = "annonce")
-    @JsonManagedReference
+    @JsonBackReference
     private List<PaymentPremium> paymentsPremium;
 
     @OneToMany(mappedBy = "annonce")
-    @JsonManagedReference
+    @JsonManagedReference("annonce-interactions")
     private List<Interaction> interactions;
 
     @OneToMany(mappedBy = "annonce")
-    @JsonBackReference
-    private List<Conversation> conversations;
-
-    @OneToMany(mappedBy = "annonce")
-    @JsonManagedReference
+    @JsonManagedReference("annonce-notifications")
     private List<Notification> notifications;
 
     @Column(name = "created_at", nullable = false)
@@ -249,14 +245,6 @@ public class Annonce {
 
     public void setInteractions(List<Interaction> interactions) {
         this.interactions = interactions;
-    }
-
-    public List<Conversation> getConversations() {
-        return conversations;
-    }
-
-    public void setConversations(List<Conversation> conversations) {
-        this.conversations = conversations;
     }
 
     public List<Notification> getNotifications() {

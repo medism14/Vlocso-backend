@@ -21,10 +21,13 @@ import com.vlosco.backend.repository.VehicleRepository;
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -59,13 +62,13 @@ public class DataSeederService {
                 if (userRepository.count() == 0) {
                         seedUsers();
                         seedVehiclesAndAnnonces();
-                        seedInteractions();
+                        // seedInteractions();
                 }
         }
 
         private void seedUsers() {
                 List<User> users = new ArrayList<>();
-                for (int i = 0; i < 100; i++) {
+                for (int i = 0; i < 5; i++) {
                         User user = new User();
                         user.setFirstName(faker.name().firstName());
                         user.setLastName(faker.name().lastName());
@@ -103,7 +106,7 @@ public class DataSeederService {
                 String[] categoryItemsMotos = AnnonceData.CATEGORY_ITEMS_MOTOS;
                 String[] cityItems = AnnonceData.CITY_ITEMS;
 
-                for (int i = 0; i < 100; i++) {
+                for (int i = 0; i < 5; i++) {
                         AnnonceCreationDTO annonceCreationDTO = new AnnonceCreationDTO();
                         AnnonceDetailsCreationDTO annonceDetails = new AnnonceDetailsCreationDTO();
                         VehicleCreationDTO vehicleDetails = new VehicleCreationDTO();
@@ -188,8 +191,19 @@ public class DataSeederService {
                         return;
                 }
 
+                // Sélectionner 40 utilisateurs au hasard qui n'auront pas d'interactions
+                List<User> usersWithoutInteractions = new ArrayList<>(users);
+                Collections.shuffle(usersWithoutInteractions);
+                Set<Long> excludedUserIds = usersWithoutInteractions.subList(0, 40).stream()
+                        .map(User::getUserId)
+                        .collect(Collectors.toSet());
+
                 for (User user : users) {
-                        int numberOfInteractions = random.nextInt(10) + 1;
+                        if (excludedUserIds.contains(user.getUserId())) {
+                                continue;
+                        }
+
+                        int numberOfInteractions = random.nextInt(500);
 
                         for (int j = 0; j < numberOfInteractions; j++) {
                                 Interaction interaction = new Interaction();
