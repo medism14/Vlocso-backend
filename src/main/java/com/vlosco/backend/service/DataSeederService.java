@@ -21,18 +21,22 @@ import com.vlosco.backend.repository.VehicleRepository;
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class DataSeederService {
+        private static final Logger log = LoggerFactory.getLogger(DataSeederService.class);
+        private static final int BATCH_SIZE = 50;
         private final UserRepository userRepository;
         private final AnnonceService annonceService;
         private final PasswordService passwordService;
@@ -58,17 +62,25 @@ public class DataSeederService {
         }
 
         @PostConstruct
+        @Transactional
         public void seedData() {
-                if (userRepository.count() == 0) {
-                        seedUsers();
-                        seedVehiclesAndAnnonces();
-                        seedInteractions();
+                try {
+                        if (userRepository.count() == 0) {
+                                log.info("Début du seeding des données...");
+                                seedUsersInBatches();
+                                seedVehiclesAndAnnoncesBatched();
+                                seedInteractionsInBatches();
+                                log.info("Seeding terminé avec succès");
+                        }
+                } catch (Exception e) {
+                        log.error("Erreur lors du seeding: {}", e.getMessage(), e);
                 }
         }
 
-        private void seedUsers() {
-                List<User> users = new ArrayList<>();
-                for (int i = 0; i < 2500; i++) {
+        @Transactional
+        private void seedUsersInBatches() {
+                List<User> userBatch = new ArrayList<>();
+                for (int i = 0; i < 2000; i++) {
                         User user = new User();
                         user.setFirstName(faker.name().firstName());
                         user.setLastName(faker.name().lastName());
@@ -81,13 +93,22 @@ public class DataSeederService {
                         user.setEmailVerified(true);
                         user.setRole(UserRole.USER);
                         user.setType(UserType.REGULAR);
-                        users.add(user);
+                        userBatch.add(user);
+                        
+                        if (userBatch.size() >= BATCH_SIZE) {
+                                userRepository.saveAll(userBatch);
+                                userBatch.clear();
+                        }
                 }
-                userRepository.saveAll(users);
+                if (!userBatch.isEmpty()) {
+                        userRepository.saveAll(userBatch);
+                }
         }
 
-        private void seedVehiclesAndAnnonces() {
+        @Transactional
+        private void seedVehiclesAndAnnoncesBatched() {
                 List<User> users = userRepository.findAll();
+                List<AnnonceCreationDTO> batch = new ArrayList<>();
 
                 Map<String, List<String>> carModels = VehicleData.carModels;
                 List<String> carBrands = new ArrayList<>(carModels.keySet());
@@ -106,7 +127,7 @@ public class DataSeederService {
                 String[] categoryItemsMotos = AnnonceData.CATEGORY_ITEMS_MOTOS;
                 String[] cityItems = AnnonceData.CITY_ITEMS;
 
-                for (int i = 0; i < 2500; i++) {
+                for (int i = 0; i < 1000 ; i++) {
                         AnnonceCreationDTO annonceCreationDTO = new AnnonceCreationDTO();
                         AnnonceDetailsCreationDTO annonceDetails = new AnnonceDetailsCreationDTO();
                         VehicleCreationDTO vehicleDetails = new VehicleCreationDTO();
@@ -178,33 +199,45 @@ public class DataSeederService {
                         images.add("https://images.pexels.com/photos/1302434/pexels-photo-1302434.jpeg?cs=srgb&dl=pexels-alexfu-1302434.jpg&fm=jpg");
                         annonceCreationDTO.setImages(images);
 
-                        annonceService.createAnnonce(annonceCreationDTO);
+                        batch.add(annonceCreationDTO);
+                        
+                        if (batch.size() >= BATCH_SIZE) {
+                                saveAnnonceBatch(batch);
+                                batch.clear();
+                        }
+                }
+                if (!batch.isEmpty()) {
+                        saveAnnonceBatch(batch);
                 }
         }
 
-        private void seedInteractions() {
+        @Transactional
+        private void saveAnnonceBatch(List<AnnonceCreationDTO> batch) {
+                for (AnnonceCreationDTO dto : batch) {
+                        try {
+                                annonceService.createAnnonce(dto);
+                        } catch (Exception e) {
+                                log.error("Erreur lors de la création d'une annonce: {}", e.getMessage());
+                        }
+                }
+        }
+
+        @Transactional
+        private void seedInteractionsInBatches() {
                 List<User> users = userRepository.findAll();
                 List<Annonce> annonces = annonceRepository.findAll();
+                List<Interaction> interactionBatch = new ArrayList<>();
+
                 String[] INTERACTIONS_TYPES = InteractionData.INTERACTIONS_TYPES;
 
                 if (users.isEmpty() || annonces.isEmpty()) {
                         return;
                 }
 
-                // Sélectionner 40 utilisateurs au hasard qui n'auront pas d'interactions
-                List<User> usersWithoutInteractions = new ArrayList<>(users);
-                Collections.shuffle(usersWithoutInteractions);
-                Set<Long> excludedUserIds = usersWithoutInteractions.subList(0, 40).stream()
-                        .map(User::getUserId)
-                        .collect(Collectors.toSet());
-
                 for (User user : users) {
-                        if (excludedUserIds.contains(user.getUserId())) {
-                                continue;
-                        }
-
-                        int numberOfInteractions = random.nextInt(150);
-
+                        if (random.nextInt(100) < 5) continue;
+                        
+                        int numberOfInteractions = random.nextInt(50) + 1;
                         for (int j = 0; j < numberOfInteractions; j++) {
                                 Interaction interaction = new Interaction();
                                 Annonce annonce = annonces.get(random.nextInt(annonces.size()));
@@ -219,8 +252,17 @@ public class DataSeederService {
                                                         faker.lorem().words(faker.number().numberBetween(1, 7))));
                                 }
 
-                                interactionRepository.save(interaction);
+                                interactionBatch.add(interaction);
+                                
+                                if (interactionBatch.size() >= BATCH_SIZE) {
+                                        interactionRepository.saveAll(interactionBatch);
+                                        interactionBatch.clear();
+                                }
                         }
                 }
+                if (!interactionBatch.isEmpty()) {
+                        interactionRepository.saveAll(interactionBatch);
+                }
         }
+
 }

@@ -48,7 +48,6 @@ com/vlosco/backend/security/SwaggerConfig.class
 com/vlosco/backend/model/Vehicle.class
 com/vlosco/backend/controller/MessageController.class
 com/vlosco/backend/enums/UserType.class
-com/vlosco/backend/service/DataSeederService.class
 com/vlosco/backend/service/PaymentPremiumService.class
 com/vlosco/backend/dto/UserUpdateDTO.class
 com/vlosco/backend/enums/ClimatisationVehicle.class

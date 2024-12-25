@@ -5,7 +5,6 @@
 package com.vlosco.backend.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -92,10 +91,13 @@ public class AnnonceController {
             @ApiResponse(responseCode = "404", description = "Aucune recommandation trouvée"),
             @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
         })
-        @GetMapping("/recommandation/{userId}")
+        @PostMapping("/recommandation/{userId}")
         public ResponseEntity<ResponseDTO<List<Annonce>>> getRecommandationsUser(
-            @Parameter(description = "ID de l'utilisateur") @PathVariable Long userId, @RequestParam String type) {
-            return annonceService.recommandationUser(userId, type);
+            @Parameter(description = "ID de l'utilisateur") @PathVariable Long userId,
+            @Parameter(description = "Type de véhicule") @RequestParam String type,
+            @Parameter(description = "Liste des IDs d'annonces à exclure") 
+            @RequestBody(required = false) List<Long> excludeIds) {
+            return annonceService.recommandationUser(userId, type, excludeIds);
         }
 
         @Operation(summary = "Créer une nouvelle annonce", description = "Crée une nouvelle annonce avec les détails fournis")
@@ -174,7 +176,7 @@ public class AnnonceController {
                 return annonceService.getAnnoncesByLocation(country, city);
         }
 
-        @Operation(summary = "Récupérer une annonce premium", description = "R��cupère les détails d'une annonce premium par son identifiant")
+        @Operation(summary = "Récupérer une annonce premium", description = "Récupère les détails d'une annonce premium par son identifiant")
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "200", description = "Annonce premium récupérée avec succès"),
                         @ApiResponse(responseCode = "404", description = "Annonce premium non trouvée"),

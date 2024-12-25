@@ -3,6 +3,7 @@ package com.vlosco.backend.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,14 +25,13 @@ import com.vlosco.backend.dto.AnnonceDetailsUpdateDTO;
 import com.vlosco.backend.dto.AnnonceUpdateDTO;
 import com.vlosco.backend.dto.AnnonceWithUserDTO;
 import com.vlosco.backend.dto.PremiumAnnonceDTO;
-import com.vlosco.backend.dto.RecommandationUserNeedData;
 import com.vlosco.backend.dto.ResponseDTO;
 import com.vlosco.backend.enums.AnnonceState;
 import com.vlosco.backend.model.Annonce;
-import com.vlosco.backend.model.Interaction;
 import com.vlosco.backend.model.User;
 import com.vlosco.backend.model.Vehicle;
 import com.vlosco.backend.repository.AnnonceRepository;
+import com.vlosco.backend.repository.InteractionRepository;
 import com.vlosco.backend.repository.UserRepository;
 
 /**
@@ -48,19 +48,19 @@ public class AnnonceService {
     private final RestTemplate restTemplate;
 
     private final VehicleService vehicleService;
-    private final InteractionService interactionService;
+    private final InteractionRepository interactionRepository;
     private final UserRepository userRepository;
     private final ImageService imageService;
 
     public AnnonceService(AnnonceRepository annonceRepository, VehicleService vehicleService,
             UserRepository userRepository, ImageService imageService, RestTemplate restTemplate,
-            InteractionService interactionService) {
+            InteractionRepository interactionRepository) {
         this.annonceRepository = annonceRepository;
         this.vehicleService = vehicleService;
         this.userRepository = userRepository;
         this.imageService = imageService;
         this.restTemplate = restTemplate;
-        this.interactionService = interactionService;
+        this.interactionRepository = interactionRepository;
     }
 
     /**
@@ -132,47 +132,63 @@ public class AnnonceService {
      * @param type   Type de véhicule ("Voiture", "Moto" ou null pour général)
      * @return ResponseEntity contenant la liste des annonces recommandées
      */
-    public ResponseEntity<ResponseDTO<List<Annonce>>> recommandationUser(Long userId, String type) {
+    public ResponseEntity<ResponseDTO<List<Annonce>>> recommandationUser(Long userId, String type, List<Long> excludeIds) {
         ResponseDTO<List<Annonce>> response = new ResponseDTO<>();
         try {
-            // Vérifier le nombre total d'annonces
             long totalAnnonces = annonceRepository.count();
-            if (totalAnnonces < 100) {
+            long totalInteractions = interactionRepository.count();
+
+            if (totalAnnonces < 100 || totalInteractions < 100) {
                 List<Annonce> randomAnnonces;
-                if (!"General".equals(type)) {
+                if (!"general".equals(type)) {
                     randomAnnonces = annonceRepository.findByVehicleType(type);
                 } else {
                     randomAnnonces = annonceRepository.findAll();
                 }
+
+                // Filtrer les annonces déjà recommandées
+                if (excludeIds != null && !excludeIds.isEmpty()) {
+                    randomAnnonces = randomAnnonces.stream()
+                        .filter(annonce -> !excludeIds.contains(annonce.getAnnonceId()))
+                        .collect(Collectors.toList());
+                }
+
+                // Si moins de 12 annonces disponibles, retourner une liste vide
+                if (randomAnnonces.size() < 12) {
+                    response.setMessage("Il n'y a plus d'annonces à recommander");
+                    response.setData(new ArrayList<>());
+                    return new ResponseEntity<>(response, HttpStatus.OK);
+                }
+
                 Collections.shuffle(randomAnnonces);
                 response.setData(randomAnnonces.stream().limit(12).collect(Collectors.toList()));
                 response.setMessage("Recommandations aléatoires récupérées avec succès");
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
 
-            // Configuration de l'en-tête pour spécifier le type de contenu JSON
+            // Configuration pour l'appel à l'API
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+            
+            // Créer le corps de la requête avec les IDs à exclure
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("excludeIds", excludeIds != null ? excludeIds : new ArrayList<>());
+            
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
-            // Sélection de l'endpoint selon le type
+            // Sélection de l'endpoint
             String endpoint = "http://localhost:8000/recommend/";
-            if ("Voiture".equals(type)) {
-                endpoint += "cars/";
-            } else if ("Moto".equals(type)) {
-                endpoint += "motos/";
-            } else if ("General".equals(type)) {
-                endpoint += "general/";
-            }
+            endpoint += "voiture".equals(type) ? "cars/" : 
+                       "moto".equals(type) ? "motos/" : "general/";
             endpoint += userId;
 
-            // Appel à l'API de recommandation
+            // Appel à l'API
             ResponseEntity<List<Integer>> responseEntity = restTemplate.exchange(
-                    endpoint,
-                    HttpMethod.POST,
-                    requestEntity,
-                    new ParameterizedTypeReference<List<Integer>>() {
-                    });
+                endpoint,
+                HttpMethod.POST,
+                requestEntity,
+                new ParameterizedTypeReference<List<Integer>>() {}
+            );
 
             // Convertir les IDs en annonces
             List<Annonce> recommendedAnnonces = new ArrayList<>();
@@ -194,7 +210,15 @@ public class AnnonceService {
                 response.setMessage("Recommandation vide, annonces aléatoires récupérées avec succès");
             }
 
+            // Après l'appel à l'API Python, vérifier le nombre d'annonces
+            if (recommendedAnnonces.size() < 12) {
+                response.setMessage("Il n'y a plus d'annonces à recommander");
+                response.setData(new ArrayList<>());
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            }
+
             response.setData(recommendedAnnonces);
+            response.setMessage("Recommandations récupérées avec succès");
             return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (RestClientException e) {
