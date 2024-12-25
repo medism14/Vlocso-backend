@@ -68,7 +68,7 @@ public class DataSeederService {
 
         private void seedUsers() {
                 List<User> users = new ArrayList<>();
-                for (int i = 0; i < 10001; i++) {
+                for (int i = 0; i < 5000; i++) {
                         User user = new User();
                         user.setFirstName(faker.name().firstName());
                         user.setLastName(faker.name().lastName());
@@ -106,7 +106,7 @@ public class DataSeederService {
                 String[] categoryItemsMotos = AnnonceData.CATEGORY_ITEMS_MOTOS;
                 String[] cityItems = AnnonceData.CITY_ITEMS;
 
-                for (int i = 0; i < 10001; i++) {
+                for (int i = 0; i < 5000; i++) {
                         AnnonceCreationDTO annonceCreationDTO = new AnnonceCreationDTO();
                         AnnonceDetailsCreationDTO annonceDetails = new AnnonceDetailsCreationDTO();
                         VehicleCreationDTO vehicleDetails = new VehicleCreationDTO();
@@ -203,7 +203,7 @@ public class DataSeederService {
                                 continue;
                         }
 
-                        int numberOfInteractions = random.nextInt(500);
+                        int numberOfInteractions = random.nextInt(250);
 
                         for (int j = 0; j < numberOfInteractions; j++) {
                                 Interaction interaction = new Interaction();
