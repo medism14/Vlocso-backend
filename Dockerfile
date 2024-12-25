@@ -2,7 +2,7 @@
 FROM maven:3.8.7-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copier uniquement le pom.xml d'abord pour optimiser le cache des dépendances
+# Copier uniquement le pom.xml d'abord
 COPY pom.xml .
 RUN mvn dependency:go-offline
 
@@ -16,14 +16,12 @@ RUN mvn clean package -DskipTests
 FROM openjdk:17-jdk-slim
 WORKDIR /app
 
-# Variables d'environnement minimales
-ENV PORT=8080
-
 # Copier le JAR depuis l'étape de build
 COPY --from=build /app/target/*.jar app.jar
 
-# Exposer le port
+# Exposer le port dynamiquement
+ENV PORT=8080
 EXPOSE ${PORT}
 
-# Commande pour démarrer l'application
-CMD ["java", "-jar", "-Dserver.port=${PORT}", "app.jar"]
+# Script de démarrage
+ENTRYPOINT ["sh", "-c", "java -jar -Dserver.port=${PORT} app.jar"]
