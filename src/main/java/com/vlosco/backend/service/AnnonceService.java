@@ -136,7 +136,7 @@ public class AnnonceService {
      * @param type   Type de véhicule ("Voiture", "Moto" ou null pour général)
      * @return ResponseEntity contenant la liste des annonces recommandées
      */
-    public ResponseEntity<ResponseDTO<List<Annonce>>> recommandationUser(Long userId, String type, List<Long> excludeIds) {
+    public ResponseEntity<ResponseDTO<List<Annonce>>> recommandationUser(Long userId, String type, Integer nbAnnonces, List<Long> excludeIds) {
         ResponseDTO<List<Annonce>> response = new ResponseDTO<>();
         try {
             long totalAnnonces = annonceRepository.count();
@@ -157,15 +157,15 @@ public class AnnonceService {
                         .collect(Collectors.toList());
                 }
 
-                // Si moins de 12 annonces disponibles, retourner une liste vide
-                if (randomAnnonces.size() < 12) {
+                // Si moins d'annonces disponibles que demandé, retourner une liste vide
+                if (randomAnnonces.size() < nbAnnonces) {
                     response.setMessage("Il n'y a plus d'annonces à recommander");
                     response.setData(new ArrayList<>());
                     return new ResponseEntity<>(response, HttpStatus.OK);
                 }
 
                 Collections.shuffle(randomAnnonces);
-                response.setData(randomAnnonces.stream().limit(12).collect(Collectors.toList()));
+                response.setData(randomAnnonces.stream().limit(nbAnnonces).collect(Collectors.toList()));
                 response.setMessage("Recommandations aléatoires récupérées avec succès");
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
@@ -177,6 +177,7 @@ public class AnnonceService {
             // Créer le corps de la requête avec les IDs à exclure
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("excludeIds", excludeIds != null ? excludeIds : new ArrayList<>());
+            requestBody.put("nbAnnonces", nbAnnonces);
             
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
@@ -211,7 +212,7 @@ public class AnnonceService {
             }
 
             // Après l'appel à l'API Python, vérifier le nombre d'annonces
-            if (recommendedAnnonces.size() < 12) {
+            if (recommendedAnnonces.size() < nbAnnonces) {
                 response.setMessage("Il n'y a plus d'annonces à recommander");
                 response.setData(new ArrayList<>());
                 return new ResponseEntity<>(response, HttpStatus.OK);
