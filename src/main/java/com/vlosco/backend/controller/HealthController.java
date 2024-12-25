@@ -9,6 +9,6 @@ public class HealthController {
     
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {
-        return ResponseEntity.ok("<html><body style='display: flex; justify-content: center; align-items: center; height: 100vh;'><h1>Service is up and running</h1></body></html>");
+        return ResponseEntity.ok("Server is running up");
     }
-} 
+}
