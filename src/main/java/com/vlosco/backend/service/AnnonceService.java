@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -51,6 +52,9 @@ public class AnnonceService {
     private final InteractionRepository interactionRepository;
     private final UserRepository userRepository;
     private final ImageService imageService;
+
+    @Value("${fastapi.url}")
+    private String fastapiUrl;
 
     public AnnonceService(AnnonceRepository annonceRepository, VehicleService vehicleService,
             UserRepository userRepository, ImageService imageService, RestTemplate restTemplate,
@@ -176,11 +180,7 @@ public class AnnonceService {
             
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
-            // Sélection de l'endpoint
-            String endpoint = "http://localhost:8000/recommend/";
-            endpoint += "voiture".equals(type) ? "cars/" : 
-                       "moto".equals(type) ? "motos/" : "general/";
-            endpoint += userId;
+            String endpoint = fastapiUrl + (type.equals("voitures") ? "voitures/" : type.equals("motos") ? "motos/" : "general/") + userId;
 
             // Appel à l'API
             ResponseEntity<List<Integer>> responseEntity = restTemplate.exchange(

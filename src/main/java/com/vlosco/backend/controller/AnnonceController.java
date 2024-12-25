@@ -94,7 +94,7 @@ public class AnnonceController {
         @PostMapping("/recommandation/{userId}")
         public ResponseEntity<ResponseDTO<List<Annonce>>> getRecommandationsUser(
             @Parameter(description = "ID de l'utilisateur") @PathVariable Long userId,
-            @Parameter(description = "Type de véhicule") @RequestParam String type,
+            @Parameter(description = "Type de véhicule (valeurs possibles: 'general', 'voitures', 'motos')") @RequestParam String type,
             @Parameter(description = "Liste des IDs d'annonces à exclure") 
             @RequestBody(required = false) List<Long> excludeIds) {
             return annonceService.recommandationUser(userId, type, excludeIds);
