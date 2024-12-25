@@ -4,6 +4,7 @@
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/controller/AuthController.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/controller/AuthProviderController.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/controller/ConversationController.java
+/Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/controller/HealthController.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/controller/ImageController.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/controller/InteractionController.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/controller/MessageController.java
