@@ -228,4 +228,20 @@ public class AnnonceController {
                 return imageServices.getImagesByAnnonceId(id);
         }
 
+        @Operation(summary = "Trouver des annonces similaires", 
+                  description = "Trouve des annonces similaires basées sur une annonce spécifique")
+        @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Annonces similaires trouvées"),
+            @ApiResponse(responseCode = "404", description = "Annonce de référence non trouvée"),
+            @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
+        })
+        @GetMapping("/similar/{annonceId}")
+        public ResponseEntity<ResponseDTO<List<Annonce>>> getSimilarAnnonces(
+            @Parameter(description = "ID de l'annonce de référence") 
+            @PathVariable Long annonceId,
+            @Parameter(description = "Nombre d'annonces similaires à retourner") 
+            @RequestParam(defaultValue = "4") Integer nbAnnonces) {
+            return annonceService.findSimilarAnnonces(annonceId, nbAnnonces);
+        }
+
 }

@@ -621,4 +621,98 @@ public class AnnonceService {
         }
     }
 
+    public ResponseEntity<ResponseDTO<List<Annonce>>> findSimilarAnnonces(Long annonceId, Integer nbAnnonces) {
+        ResponseDTO<List<Annonce>> response = new ResponseDTO<>();
+        try {
+            Optional<Annonce> referenceAnnonce = annonceRepository.findById(annonceId);
+            if (referenceAnnonce.isEmpty()) {
+                response.setMessage("Annonce de référence non trouvée");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+
+            Annonce reference = referenceAnnonce.get();
+            Vehicle referenceVehicle = reference.getVehicle();
+
+            // Récupérer les annonces actives du même type avec une seule requête optimisée
+            List<Annonce> similarAnnonces = annonceRepository.findSimilarAnnonces(
+                referenceVehicle.getType(),
+                referenceVehicle.getMark(),
+                referenceVehicle.getModel(),
+                referenceVehicle.getCategory(),
+                referenceVehicle.getFuelType(),
+                referenceVehicle.getYear(),
+                reference.getPrice(),
+                annonceId,
+                reference.getCity()
+            );
+
+            // Calculer les scores de similarité avec pondération
+            Map<Annonce, Double> similarityScores = new HashMap<>();
+            for (Annonce annonce : similarAnnonces) {
+                double score = calculateSimilarityScore(reference, annonce);
+                similarityScores.put(annonce, score);
+            }
+
+            // Trier par score de similarité
+            List<Annonce> sortedAnnonces = similarityScores.entrySet().stream()
+                .sorted(Map.Entry.<Annonce, Double>comparingByValue().reversed())
+                .limit(nbAnnonces * 3)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+            // Mélanger les meilleures annonces et prendre le nombre demandé
+            Collections.shuffle(sortedAnnonces.subList(0, Math.min(sortedAnnonces.size(), nbAnnonces * 2)));
+            List<Annonce> finalAnnonces = sortedAnnonces.stream()
+                .limit(nbAnnonces)
+                .collect(Collectors.toList());
+
+            response.setData(finalAnnonces);
+            response.setMessage("Annonces similaires trouvées avec succès");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setMessage("Erreur lors de la recherche d'annonces similaires: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private double calculateSimilarityScore(Annonce reference, Annonce other) {
+        double score = 0.0;
+        Vehicle refVehicle = reference.getVehicle();
+        Vehicle otherVehicle = other.getVehicle();
+
+        // Critères véhicule avec pondération
+        if (refVehicle.getMark().equalsIgnoreCase(otherVehicle.getMark())) score += 25.0;
+        if (refVehicle.getModel().equalsIgnoreCase(otherVehicle.getModel())) score += 20.0;
+        if (refVehicle.getCategory().equalsIgnoreCase(otherVehicle.getCategory())) score += 15.0;
+        if (refVehicle.getFuelType().equalsIgnoreCase(otherVehicle.getFuelType())) score += 10.0;
+        if (refVehicle.getGearbox().equalsIgnoreCase(otherVehicle.getGearbox())) score += 5.0;
+        if (refVehicle.getColor().equalsIgnoreCase(otherVehicle.getColor())) score += 3.0;
+
+        // Proximité d'année (score dégressif)
+        int yearDiff = Math.abs(refVehicle.getYear() - otherVehicle.getYear());
+        if (yearDiff == 0) score += 10.0;
+        else if (yearDiff <= 2) score += 7.0;
+        else if (yearDiff <= 5) score += 4.0;
+
+        // Proximité de kilométrage (score dégressif)
+        int kmDiff = Math.abs(Integer.parseInt(refVehicle.getKlmCounter()) - 
+                         Integer.parseInt(otherVehicle.getKlmCounter()));
+        if (kmDiff < 10000) score += 5.0;
+        else if (kmDiff < 30000) score += 3.0;
+        else if (kmDiff < 50000) score += 1.0;
+
+        // Proximité de prix
+        double priceDiff = Math.abs(Double.parseDouble(reference.getPrice()) - 
+                               Double.parseDouble(other.getPrice()));
+        double refPrice = Double.parseDouble(reference.getPrice());
+        if (priceDiff < refPrice * 0.1) score += 5.0;
+        else if (priceDiff < refPrice * 0.2) score += 3.0;
+        else if (priceDiff < refPrice * 0.3) score += 1.0; 
+
+        // Bonus pour même ville/région
+        if (reference.getCity().equalsIgnoreCase(other.getCity())) score += 2.0;
+
+        return score;
+    }
+
 }

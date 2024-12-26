@@ -1,6 +1,7 @@
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/BackendApplication.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/config/RestTemplateConfig.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/controller/AnnonceController.java
+/Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/controller/AnnonceFilterController.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/controller/AuthController.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/controller/AuthProviderController.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/controller/ConversationController.java
@@ -18,6 +19,8 @@
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/dto/AnnonceDetailsCreationDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/dto/AnnonceDetailsDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/dto/AnnonceDetailsUpdateDTO.java
+/Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/dto/AnnonceFilterDTO.java
+/Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/dto/AnnonceSearchDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/dto/AnnonceUpdateDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/dto/AnnonceWithUserDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/dto/AnnonceWithVehicle.java
@@ -35,6 +38,7 @@
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/dto/RecommandationUserNeedData.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/dto/RefreshTokenDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/dto/ResponseDTO.java
+/Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/dto/SimilarAnnonceRequestDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/dto/TokenDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/dto/UpdateAuthProviderDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/dto/UpdateProviderDTO.java
@@ -87,6 +91,7 @@
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/security/SecurityConfig.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/security/SwaggerConfig.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/security/WebConfig.java
+/Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/service/AnnonceFilterService.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/service/AnnonceService.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/service/AuthProviderService.java
 /Users/medism14/Desktop/Dev/Vlocso/BackAndApi/Backend/src/main/java/com/vlosco/backend/service/AuthService.java

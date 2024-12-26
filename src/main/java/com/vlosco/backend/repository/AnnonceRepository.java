@@ -66,4 +66,46 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
             @Param("city") String city,
             @Param("minKilometrage") Integer minKilometrage, @Param("maxKilometrage") Integer maxKilometrage,
             @Param("minPrice") Double minPrice, @Param("maxPrice") Double maxPrice, @Param("marque") String marque);
+
+    @Query("SELECT a FROM Annonce a JOIN a.vehicle v WHERE v.type = :type AND a.annonceId != :annonceId AND a.annonceState = 'ACTIVE'")
+    List<Annonce> findByVehicleTypeAndAnnonceIdNot(String type, Long annonceId);
+
+    @Query("""
+        SELECT a FROM Annonce a 
+        JOIN FETCH a.vehicle v 
+        JOIN FETCH a.vendor 
+        WHERE v.type = :type 
+        AND a.annonceId != :annonceId 
+        AND a.annonceState = 'ACTIVE'
+        AND (
+            v.mark = :mark 
+            OR v.model = :model 
+            OR v.category = :category 
+            OR v.fuelType = :fuelType 
+            OR ABS(v.year - :year) <= 5
+            OR ABS(CAST(a.price AS double) - :price) <= :price * 0.3
+            OR a.city = :city
+        )
+        ORDER BY 
+            CASE WHEN v.mark = :mark THEN 1 ELSE 0 END +
+            CASE WHEN v.model = :model THEN 1 ELSE 0 END +
+            CASE WHEN v.category = :category THEN 1 ELSE 0 END +
+            CASE WHEN v.fuelType = :fuelType THEN 1 ELSE 0 END +
+            CASE WHEN ABS(v.year - :year) <= 2 THEN 1 ELSE 0 END +
+            CASE WHEN a.city = :city THEN 1 ELSE 0 END DESC
+    """)
+    List<Annonce> findSimilarAnnonces(
+        @Param("type") String type,
+        @Param("mark") String mark,
+        @Param("model") String model,
+        @Param("category") String category,
+        @Param("fuelType") String fuelType,
+        @Param("year") Integer year,
+        @Param("price") String price,
+        @Param("annonceId") Long annonceId,
+        @Param("city") String city
+    );
+
+    @Query("SELECT DISTINCT a FROM Annonce a LEFT JOIN FETCH a.vehicle v WHERE a.annonceId IN :ids")
+    List<Annonce> findAllByIdWithVehicle(@Param("ids") List<Long> ids);
 }
