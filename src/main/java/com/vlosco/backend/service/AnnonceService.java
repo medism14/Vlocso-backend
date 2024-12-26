@@ -4,9 +4,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +36,7 @@ import com.vlosco.backend.model.Vehicle;
 import com.vlosco.backend.repository.AnnonceRepository;
 import com.vlosco.backend.repository.InteractionRepository;
 import com.vlosco.backend.repository.UserRepository;
+import com.vlosco.backend.utils.SearchUtils;
 
 /**
  * Service gérant les annonces de véhicules.
@@ -136,7 +139,8 @@ public class AnnonceService {
      * @param type   Type de véhicule ("Voiture", "Moto" ou null pour général)
      * @return ResponseEntity contenant la liste des annonces recommandées
      */
-    public ResponseEntity<ResponseDTO<List<Annonce>>> recommandationUser(Long userId, String type, Integer nbAnnonces, List<Long> excludeIds) {
+    public ResponseEntity<ResponseDTO<List<Annonce>>> recommandationUser(Long userId, String type, Integer nbAnnonces,
+            List<Long> excludeIds) {
         ResponseDTO<List<Annonce>> response = new ResponseDTO<>();
         try {
             long totalAnnonces = annonceRepository.count();
@@ -153,8 +157,8 @@ public class AnnonceService {
                 // Filtrer les annonces déjà recommandées
                 if (excludeIds != null && !excludeIds.isEmpty()) {
                     randomAnnonces = randomAnnonces.stream()
-                        .filter(annonce -> !excludeIds.contains(annonce.getAnnonceId()))
-                        .collect(Collectors.toList());
+                            .filter(annonce -> !excludeIds.contains(annonce.getAnnonceId()))
+                            .collect(Collectors.toList());
                 }
 
                 // Si moins d'annonces disponibles que demandé, retourner une liste vide
@@ -173,23 +177,24 @@ public class AnnonceService {
             // Configuration pour l'appel à l'API
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            
+
             // Créer le corps de la requête avec les IDs à exclure
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("excludeIds", excludeIds != null ? excludeIds : new ArrayList<>());
             requestBody.put("nbAnnonces", nbAnnonces);
-            
+
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
-            String endpoint = fastapiUrl + (type.equals("voitures") ? "voitures/" : type.equals("motos") ? "motos/" : "general/") + userId;
+            String endpoint = fastapiUrl
+                    + (type.equals("voitures") ? "voitures/" : type.equals("motos") ? "motos/" : "general/") + userId;
 
             // Appel à l'API
             ResponseEntity<List<Integer>> responseEntity = restTemplate.exchange(
-                endpoint,
-                HttpMethod.POST,
-                requestEntity,
-                new ParameterizedTypeReference<List<Integer>>() {}
-            );
+                    endpoint,
+                    HttpMethod.POST,
+                    requestEntity,
+                    new ParameterizedTypeReference<List<Integer>>() {
+                    });
 
             // Convertir les IDs en annonces
             List<Annonce> recommendedAnnonces = new ArrayList<>();
@@ -459,20 +464,93 @@ public class AnnonceService {
      *         - 204 NO_CONTENT: Si aucune annonce ne correspond au mot-clé
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
-    public ResponseEntity<ResponseDTO<List<Annonce>>> searchAnnonces(String keyword) {
+    public ResponseEntity<ResponseDTO<List<Annonce>>> searchAnnonces(String searchText, String[] excludedIds,
+            Integer nbAnnonces) {
         ResponseDTO<List<Annonce>> response = new ResponseDTO<>();
         try {
-            List<Annonce> annonces = annonceRepository.findByTitleContaining(keyword);
-            if (annonces.isEmpty()) {
-                response.setMessage("Aucune annonce trouvée avec le mot-clé: " + keyword);
-                return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+            Map<String, String> searchCriteria = SearchUtils.analyzeSearchText(searchText != null ? searchText : "");
+
+            String type = searchCriteria.get("vehicle.type");
+            String mark = searchCriteria.get("vehicle.mark");
+            String model = searchCriteria.get("vehicle.model");
+            String color = searchCriteria.get("vehicle.color");
+            String category = searchCriteria.get("vehicle.category");
+            String fuelType = searchCriteria.get("vehicle.fuelType");
+            Integer year = searchCriteria.get("vehicle.year") != null ? Integer.valueOf(searchCriteria.get("vehicle.year")) : null;
+            String city = searchCriteria.get("vehicle.city");
+
+            Integer limit = nbAnnonces != null ? nbAnnonces : 20;
+            Set<Annonce> allAnnonces = new LinkedHashSet<>();
+
+            // Premier essai avec tous les critères
+            List<Annonce> annonces = annonceRepository.searchAnnoncesAdvanced(
+                    type, mark, model, category, fuelType, color, city, year, excludedIds, limit);
+            allAnnonces.addAll(annonces);
+
+            // Si on n'a pas atteint la limite, on fait des recherches progressivement plus larges
+            if (allAnnonces.size() < limit) {
+                // Mise à jour des IDs exclus
+                String[] newExcludedIds = allAnnonces.stream()
+                        .map(a -> a.getAnnonceId().toString())
+                        .toArray(String[]::new);
+
+                // Recherche sans la ville
+                if (city != null) {
+                    annonces = annonceRepository.searchAnnoncesAdvanced(
+                            type, mark, model, category, fuelType, color, null, year, newExcludedIds, limit);
+                    allAnnonces.addAll(annonces);
+                }
+
+                // Recherche sans l'année
+                if (allAnnonces.size() < limit && year != null) {
+                    newExcludedIds = allAnnonces.stream()
+                            .map(a -> a.getAnnonceId().toString())
+                            .toArray(String[]::new);
+                    annonces = annonceRepository.searchAnnoncesAdvanced(
+                            type, mark, model, category, fuelType, color, null, null, newExcludedIds, limit);
+                    allAnnonces.addAll(annonces);
+                }
+
+                // Recherche avec uniquement type et marque
+                if (allAnnonces.size() < limit && (model != null || category != null || fuelType != null || color != null)) {
+                    newExcludedIds = allAnnonces.stream()
+                            .map(a -> a.getAnnonceId().toString())
+                            .toArray(String[]::new);
+                    annonces = annonceRepository.searchAnnoncesAdvanced(
+                            type, mark, null, null, null, null, null, null, newExcludedIds, limit);
+                    allAnnonces.addAll(annonces);
+                }
+
+                // Recherche avec uniquement le type
+                if (allAnnonces.size() < limit && mark != null) {
+                    newExcludedIds = allAnnonces.stream()
+                            .map(a -> a.getAnnonceId().toString())
+                            .toArray(String[]::new);
+                    annonces = annonceRepository.searchAnnoncesAdvanced(
+                            type, null, null, null, null, null, null, null, newExcludedIds, limit);
+                    allAnnonces.addAll(annonces);
+                }
+
+                // Si toujours pas assez, on prend les annonces populaires
+                if (allAnnonces.size() < limit) {
+                    newExcludedIds = allAnnonces.stream()
+                            .map(a -> a.getAnnonceId().toString())
+                            .toArray(String[]::new);
+                    annonces = annonceRepository.findMostPopularAnnonces(limit, newExcludedIds);
+                    allAnnonces.addAll(annonces);
+                }
             }
-            response.setMessage("Les annonces ont été trouvées avec succès");
-            response.setData(annonces);
+
+            // Conversion en liste et mélange aléatoire
+            List<Annonce> finalAnnonces = new ArrayList<>(allAnnonces);
+
+            response.setData(finalAnnonces);
+            response.setMessage("Recherche effectuée avec succès");
             return new ResponseEntity<>(response, HttpStatus.OK);
+
         } catch (Exception e) {
             e.printStackTrace();
-            response.setMessage("Une erreur est survenue lors de la recherche des annonces");
+            response.setMessage("Une erreur est survenue lors de la recherche : " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -635,16 +713,15 @@ public class AnnonceService {
 
             // Récupérer les annonces actives du même type avec une seule requête optimisée
             List<Annonce> similarAnnonces = annonceRepository.findSimilarAnnonces(
-                referenceVehicle.getType(),
-                referenceVehicle.getMark(),
-                referenceVehicle.getModel(),
-                referenceVehicle.getCategory(),
-                referenceVehicle.getFuelType(),
-                referenceVehicle.getYear(),
-                reference.getPrice(),
-                annonceId,
-                reference.getCity()
-            );
+                    referenceVehicle.getType(),
+                    referenceVehicle.getMark(),
+                    referenceVehicle.getModel(),
+                    referenceVehicle.getCategory(),
+                    referenceVehicle.getFuelType(),
+                    referenceVehicle.getYear(),
+                    reference.getPrice(),
+                    annonceId,
+                    reference.getCity());
 
             // Calculer les scores de similarité avec pondération
             Map<Annonce, Double> similarityScores = new HashMap<>();
@@ -655,16 +732,16 @@ public class AnnonceService {
 
             // Trier par score de similarité
             List<Annonce> sortedAnnonces = similarityScores.entrySet().stream()
-                .sorted(Map.Entry.<Annonce, Double>comparingByValue().reversed())
-                .limit(nbAnnonces * 3)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                    .sorted(Map.Entry.<Annonce, Double>comparingByValue().reversed())
+                    .limit(nbAnnonces * 3)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
 
             // Mélanger les meilleures annonces et prendre le nombre demandé
             Collections.shuffle(sortedAnnonces.subList(0, Math.min(sortedAnnonces.size(), nbAnnonces * 2)));
             List<Annonce> finalAnnonces = sortedAnnonces.stream()
-                .limit(nbAnnonces)
-                .collect(Collectors.toList());
+                    .limit(nbAnnonces)
+                    .collect(Collectors.toList());
 
             response.setData(finalAnnonces);
             response.setMessage("Annonces similaires trouvées avec succès");
@@ -681,36 +758,52 @@ public class AnnonceService {
         Vehicle otherVehicle = other.getVehicle();
 
         // Critères véhicule avec pondération
-        if (refVehicle.getMark().equalsIgnoreCase(otherVehicle.getMark())) score += 25.0;
-        if (refVehicle.getModel().equalsIgnoreCase(otherVehicle.getModel())) score += 20.0;
-        if (refVehicle.getCategory().equalsIgnoreCase(otherVehicle.getCategory())) score += 15.0;
-        if (refVehicle.getFuelType().equalsIgnoreCase(otherVehicle.getFuelType())) score += 10.0;
-        if (refVehicle.getGearbox().equalsIgnoreCase(otherVehicle.getGearbox())) score += 5.0;
-        if (refVehicle.getColor().equalsIgnoreCase(otherVehicle.getColor())) score += 3.0;
+        if (refVehicle.getMark().equalsIgnoreCase(otherVehicle.getMark()))
+            score += 25.0;
+        if (refVehicle.getModel().equalsIgnoreCase(otherVehicle.getModel()))
+            score += 20.0;
+        if (refVehicle.getCategory().equalsIgnoreCase(otherVehicle.getCategory()))
+            score += 15.0;
+        if (refVehicle.getFuelType().equalsIgnoreCase(otherVehicle.getFuelType()))
+            score += 10.0;
+        if (refVehicle.getGearbox().equalsIgnoreCase(otherVehicle.getGearbox()))
+            score += 5.0;
+        if (refVehicle.getColor().equalsIgnoreCase(otherVehicle.getColor()))
+            score += 3.0;
 
         // Proximité d'année (score dégressif)
         int yearDiff = Math.abs(refVehicle.getYear() - otherVehicle.getYear());
-        if (yearDiff == 0) score += 10.0;
-        else if (yearDiff <= 2) score += 7.0;
-        else if (yearDiff <= 5) score += 4.0;
+        if (yearDiff == 0)
+            score += 10.0;
+        else if (yearDiff <= 2)
+            score += 7.0;
+        else if (yearDiff <= 5)
+            score += 4.0;
 
         // Proximité de kilométrage (score dégressif)
-        int kmDiff = Math.abs(Integer.parseInt(refVehicle.getKlmCounter()) - 
-                         Integer.parseInt(otherVehicle.getKlmCounter()));
-        if (kmDiff < 10000) score += 5.0;
-        else if (kmDiff < 30000) score += 3.0;
-        else if (kmDiff < 50000) score += 1.0;
+        int kmDiff = Math.abs(Integer.parseInt(refVehicle.getKlmCounter()) -
+                Integer.parseInt(otherVehicle.getKlmCounter()));
+        if (kmDiff < 10000)
+            score += 5.0;
+        else if (kmDiff < 30000)
+            score += 3.0;
+        else if (kmDiff < 50000)
+            score += 1.0;
 
         // Proximité de prix
-        double priceDiff = Math.abs(Double.parseDouble(reference.getPrice()) - 
-                               Double.parseDouble(other.getPrice()));
+        double priceDiff = Math.abs(Double.parseDouble(reference.getPrice()) -
+                Double.parseDouble(other.getPrice()));
         double refPrice = Double.parseDouble(reference.getPrice());
-        if (priceDiff < refPrice * 0.1) score += 5.0;
-        else if (priceDiff < refPrice * 0.2) score += 3.0;
-        else if (priceDiff < refPrice * 0.3) score += 1.0; 
+        if (priceDiff < refPrice * 0.1)
+            score += 5.0;
+        else if (priceDiff < refPrice * 0.2)
+            score += 3.0;
+        else if (priceDiff < refPrice * 0.3)
+            score += 1.0;
 
         // Bonus pour même ville/région
-        if (reference.getCity().equalsIgnoreCase(other.getCity())) score += 2.0;
+        if (reference.getCity().equalsIgnoreCase(other.getCity()))
+            score += 2.0;
 
         return score;
     }

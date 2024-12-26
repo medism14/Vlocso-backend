@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vlosco.backend.dto.AnnonceCreationDTO;
+import com.vlosco.backend.dto.AnnonceSearchDTO;
 import com.vlosco.backend.dto.AnnonceUpdateDTO;
 import com.vlosco.backend.dto.AnnonceWithUserDTO;
 import com.vlosco.backend.dto.PremiumAnnonceDTO;
@@ -84,21 +85,19 @@ public class AnnonceController {
                 return annonceService.getAnnoncesByUserId(userId);
         }
 
-        @Operation(summary = "Récupérer les recommandations pour un utilisateur", 
-                  description = "Retourne une liste d'annonces recommandées pour l'utilisateur spécifié")
+        @Operation(summary = "Récupérer les recommandations pour un utilisateur", description = "Retourne une liste d'annonces recommandées pour l'utilisateur spécifié")
         @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Recommandations trouvées avec succès"),
-            @ApiResponse(responseCode = "404", description = "Aucune recommandation trouvée"),
-            @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
+                        @ApiResponse(responseCode = "200", description = "Recommandations trouvées avec succès"),
+                        @ApiResponse(responseCode = "404", description = "Aucune recommandation trouvée"),
+                        @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
         })
         @PostMapping("/recommandation/{userId}")
         public ResponseEntity<ResponseDTO<List<Annonce>>> getRecommandationsUser(
-            @Parameter(description = "ID de l'utilisateur") @PathVariable Long userId,
-            @Parameter(description = "Type de véhicule (valeurs possibles: 'general', 'voitures', 'motos')") @RequestParam String type,
-            @Parameter(description = "Nombre d'annonces à recommander (12 en général)") @RequestParam Integer nbAnnonces,
-            @Parameter(description = "Liste des IDs d'annonces à exclure") 
-            @RequestBody(required = false) List<Long> excludeIds) {
-            return annonceService.recommandationUser(userId, type, nbAnnonces, excludeIds);
+                        @Parameter(description = "ID de l'utilisateur") @PathVariable Long userId,
+                        @Parameter(description = "Type de véhicule (valeurs possibles: 'general', 'voitures', 'motos')") @RequestParam String type,
+                        @Parameter(description = "Nombre d'annonces à recommander (12 en général)") @RequestParam Integer nbAnnonces,
+                        @Parameter(description = "Liste des IDs d'annonces à exclure") @RequestBody(required = false) List<Long> excludeIds) {
+                return annonceService.recommandationUser(userId, type, nbAnnonces, excludeIds);
         }
 
         @Operation(summary = "Créer une nouvelle annonce", description = "Crée une nouvelle annonce avec les détails fournis")
@@ -140,16 +139,19 @@ public class AnnonceController {
                 return annonceService.deleteAnnonce(id);
         }
 
-        @Operation(summary = "Rechercher des annonces", description = "Recherche des annonces par mot-clé dans le titre")
+        @Operation(summary = "Rechercher des annonces", description = "Recherche avancée d'annonces avec texte libre")
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "200", description = "Annonces trouvées"),
                         @ApiResponse(responseCode = "204", description = "Aucune annonce trouvée"),
                         @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
         })
-        @GetMapping("/search")
+        @PostMapping("/search")
         public ResponseEntity<ResponseDTO<List<Annonce>>> searchAnnonces(
-                        @Parameter(description = "Mot-clé de recherche") @RequestParam String keyword) {
-                return annonceService.searchAnnonces(keyword);
+                        @Parameter(description = "Critères de recherche") @RequestBody AnnonceSearchDTO searchDTO) {
+                return annonceService.searchAnnonces(
+                                searchDTO.getSearchText(),
+                                searchDTO.getExcludedIds(),
+                                searchDTO.getNbAnnonces());
         }
 
         @Operation(summary = "Filtrer par catégorie", description = "Filtre les annonces par type de transaction")
@@ -228,20 +230,17 @@ public class AnnonceController {
                 return imageServices.getImagesByAnnonceId(id);
         }
 
-        @Operation(summary = "Trouver des annonces similaires", 
-                  description = "Trouve des annonces similaires basées sur une annonce spécifique")
+        @Operation(summary = "Trouver des annonces similaires", description = "Trouve des annonces similaires basées sur une annonce spécifique")
         @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Annonces similaires trouvées"),
-            @ApiResponse(responseCode = "404", description = "Annonce de référence non trouvée"),
-            @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
+                        @ApiResponse(responseCode = "200", description = "Annonces similaires trouvées"),
+                        @ApiResponse(responseCode = "404", description = "Annonce de référence non trouvée"),
+                        @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
         })
         @GetMapping("/similar/{annonceId}")
         public ResponseEntity<ResponseDTO<List<Annonce>>> getSimilarAnnonces(
-            @Parameter(description = "ID de l'annonce de référence") 
-            @PathVariable Long annonceId,
-            @Parameter(description = "Nombre d'annonces similaires à retourner") 
-            @RequestParam(defaultValue = "4") Integer nbAnnonces) {
-            return annonceService.findSimilarAnnonces(annonceId, nbAnnonces);
+                        @Parameter(description = "ID de l'annonce de référence") @PathVariable Long annonceId,
+                        @Parameter(description = "Nombre d'annonces similaires à retourner") @RequestParam(defaultValue = "4") Integer nbAnnonces) {
+                return annonceService.findSimilarAnnonces(annonceId, nbAnnonces);
         }
 
 }

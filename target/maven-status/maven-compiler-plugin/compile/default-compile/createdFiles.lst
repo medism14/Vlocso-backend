@@ -33,7 +33,6 @@ com/vlosco/backend/data/InteractionData.class
 com/vlosco/backend/dto/CreateProviderDTO.class
 com/vlosco/backend/model/Conversation.class
 com/vlosco/backend/dto/ConversationResponseDTO.class
-com/vlosco/backend/controller/ConversationController.class
 com/vlosco/backend/repository/AuthProviderRepository.class
 com/vlosco/backend/model/PaymentPremium.class
 com/vlosco/backend/repository/NotificationRepository.class
@@ -46,7 +45,6 @@ com/vlosco/backend/dto/ConversationUpdateDTO.class
 com/vlosco/backend/model/Message.class
 com/vlosco/backend/security/SwaggerConfig.class
 com/vlosco/backend/model/Vehicle.class
-com/vlosco/backend/controller/MessageController.class
 com/vlosco/backend/enums/UserType.class
 com/vlosco/backend/service/PaymentPremiumService.class
 com/vlosco/backend/dto/UserUpdateDTO.class
@@ -54,7 +52,6 @@ com/vlosco/backend/enums/ClimatisationVehicle.class
 com/vlosco/backend/service/VehicleService.class
 com/vlosco/backend/dto/UserRegistrationProviderDTO.class
 com/vlosco/backend/repository/ProviderRepository.class
-com/vlosco/backend/service/MessageService.class
 com/vlosco/backend/repository/MessageRepository.class
 com/vlosco/backend/service/AuthService.class
 com/vlosco/backend/model/Notification.class
@@ -71,14 +68,12 @@ com/vlosco/backend/dto/AnnonceDetailsCreationDTO.class
 com/vlosco/backend/repository/VehicleRepository.class
 com/vlosco/backend/dto/TokenDTO.class
 com/vlosco/backend/controller/ProviderController.class
-com/vlosco/backend/service/AnnonceService.class
 com/vlosco/backend/repository/PaymentPremiumRepository.class
 com/vlosco/backend/enums/ColorVehicle.class
 com/vlosco/backend/repository/ConversationRepository.class
 com/vlosco/backend/service/UserService.class
 com/vlosco/backend/dto/RefreshTokenDTO.class
 com/vlosco/backend/controller/AuthController.class
-com/vlosco/backend/service/ConversationService.class
 com/vlosco/backend/controller/AuthProviderController.class
 com/vlosco/backend/security/SecurityConfig.class
 com/vlosco/backend/service/NotificationService.class

@@ -3,6 +3,7 @@ package com.vlosco.backend.dto;
 public class AnnonceSearchDTO {
     private String searchText;
     private String[] excludedIds;
+    private Integer nbAnnonces; // Ajout de nbAnnonces
 
     // Getters
     public String getSearchText() {
@@ -13,6 +14,10 @@ public class AnnonceSearchDTO {
         return excludedIds != null ? excludedIds : new String[0];
     }
 
+    public Integer getNbAnnonces() { // Getter pour nbAnnonces
+        return nbAnnonces;
+    }
+
     // Setters
     public void setSearchText(String searchText) {
         this.searchText = searchText;
@@ -20,5 +25,9 @@ public class AnnonceSearchDTO {
 
     public void setExcludedIds(String[] excludedIds) {
         this.excludedIds = excludedIds;
+    }
+
+    public void setNbAnnonces(Integer nbAnnonces) { // Setter pour nbAnnonces
+        this.nbAnnonces = nbAnnonces;
     }
 } 
