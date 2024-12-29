@@ -151,4 +151,24 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
                         """)
         List<Annonce> findMostPopularAnnonces(@Param("limit") Integer limit,
                         @Param("excludedIds") String[] excludedIds);
+
+        @Query(value = """
+            SELECT DISTINCT a.* FROM annonces a 
+            LEFT JOIN vehicles v ON a.vehicle_id = v.id 
+            LEFT JOIN interactions i ON a.id = i.annonce_id 
+            WHERE v.type = :type 
+            AND a.annonce_state = 'ACTIVE'
+            AND (:excludeIds IS NULL OR a.id NOT IN :excludeIds)
+            GROUP BY a.id 
+            ORDER BY 
+                COUNT(i.id) DESC,
+                a.premium DESC,
+                a.created_at DESC 
+            LIMIT :limit
+            """, nativeQuery = true)
+        List<Annonce> findPopularAnnoncesByType(
+            @Param("type") String type,
+            @Param("limit") Integer limit,
+            @Param("excludeIds") List<Long> excludeIds
+        );
 }
