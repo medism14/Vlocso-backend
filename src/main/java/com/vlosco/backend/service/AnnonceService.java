@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -476,7 +477,9 @@ public class AnnonceService {
             String color = searchCriteria.get("vehicle.color");
             String category = searchCriteria.get("vehicle.category");
             String fuelType = searchCriteria.get("vehicle.fuelType");
-            Integer year = searchCriteria.get("vehicle.year") != null ? Integer.valueOf(searchCriteria.get("vehicle.year")) : null;
+            Integer year = searchCriteria.get("vehicle.year") != null
+                    ? Integer.valueOf(searchCriteria.get("vehicle.year"))
+                    : null;
             String city = searchCriteria.get("vehicle.city");
 
             Integer limit = nbAnnonces != null ? nbAnnonces : 20;
@@ -487,7 +490,8 @@ public class AnnonceService {
                     type, mark, model, category, fuelType, color, city, year, excludedIds, limit);
             allAnnonces.addAll(annonces);
 
-            // Si on n'a pas atteint la limite, on fait des recherches progressivement plus larges
+            // Si on n'a pas atteint la limite, on fait des recherches progressivement plus
+            // larges
             if (allAnnonces.size() < limit) {
                 // Mise à jour des IDs exclus
                 String[] newExcludedIds = allAnnonces.stream()
@@ -512,7 +516,8 @@ public class AnnonceService {
                 }
 
                 // Recherche avec uniquement type et marque
-                if (allAnnonces.size() < limit && (model != null || category != null || fuelType != null || color != null)) {
+                if (allAnnonces.size() < limit
+                        && (model != null || category != null || fuelType != null || color != null)) {
                     newExcludedIds = allAnnonces.stream()
                             .map(a -> a.getAnnonceId().toString())
                             .toArray(String[]::new);
@@ -808,57 +813,125 @@ public class AnnonceService {
         return score;
     }
 
-    public ResponseEntity<ResponseDTO<List<Annonce>>> getPopularAnnonces(String type, Integer nbAnnonces, List<Long> excludeIds) {
-        ResponseDTO<List<Annonce>> response = new ResponseDTO<>();
+    public ResponseEntity<ResponseDTO<List<HashMap<String, List<Annonce>>>>> recommandationUserNotConnected(
+            Integer nbAnnonces) {
+        ResponseDTO<List<HashMap<String, List<Annonce>>>> response = new ResponseDTO<>();
         try {
-            List<Annonce> popularAnnonces;
-            
-            if ("general".equals(type)) {
-                // Pour le type général, récupérer un mix équilibré de voitures et motos
-                int nbParType = nbAnnonces / 2;
-                
-                // Récupérer les voitures populaires
-                List<Annonce> voitures = annonceRepository.findPopularAnnoncesByType(
-                    "VOITURE",
-                    nbParType,
-                    excludeIds
-                );
-                
-                // Récupérer les motos populaires
-                List<Annonce> motos = annonceRepository.findPopularAnnoncesByType(
-                    "MOTO",
-                    nbParType,
-                    excludeIds
-                );
-                
-                popularAnnonces = new ArrayList<>();
-                popularAnnonces.addAll(voitures);
-                popularAnnonces.addAll(motos);
-                
-                // Mélanger les résultats pour une meilleure distribution
-                Collections.shuffle(popularAnnonces);
-                
-            } else {
-                // Pour un type spécifique (voitures ou motos)
-                String vehicleType = "voitures".equals(type) ? "VOITURE" : "MOTO";
-                popularAnnonces = annonceRepository.findPopularAnnoncesByType(
-                    vehicleType,
-                    nbAnnonces,
-                    excludeIds
-                );
+            if (nbAnnonces == null || nbAnnonces <= 0) {
+                nbAnnonces = 12;
             }
-            
-            if (popularAnnonces.isEmpty()) {
-                response.setMessage("Aucune annonce populaire trouvée");
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+
+            // Récupération des annonces générales (60% voitures, 40% motos)
+            int nbVoitures = (int) Math.ceil(nbAnnonces * 0.6);
+            int nbMotos = nbAnnonces - nbVoitures;
+
+            // Récupérer les annonces populaires/aléatoires pour chaque type
+            List<Annonce> recommandationGeneralesVoiture = annonceRepository.findPopularAnnonces(
+                    "Voiture",
+                    nbVoitures);
+
+            // Si on n'a pas assez d'annonces populaires, on complète avec des annonces aléatoires
+            if (recommandationGeneralesVoiture.size() < nbVoitures) {
+                List<Long> excludedIds = recommandationGeneralesVoiture.stream()
+                    .map(Annonce::getAnnonceId)
+                    .collect(Collectors.toList());
+                int remaining = nbVoitures - recommandationGeneralesVoiture.size();
+                List<Annonce> additionalVoitures = annonceRepository.findPopularAnnonces(
+                    "Voiture",
+                    excludedIds,
+                    remaining);
+                recommandationGeneralesVoiture.addAll(additionalVoitures);
             }
-            
-            response.setData(popularAnnonces);
-            response.setMessage("Annonces populaires récupérées avec succès");
+
+            List<Annonce> recommandationGeneralesMoto = annonceRepository.findPopularAnnonces(
+                    "Moto",
+                    nbMotos);
+
+            // Même chose pour les motos
+            if (recommandationGeneralesMoto.size() < nbMotos) {
+                List<Long> excludedIds = recommandationGeneralesMoto.stream()
+                    .map(Annonce::getAnnonceId)
+                    .collect(Collectors.toList());
+                int remaining = nbMotos - recommandationGeneralesMoto.size();
+                List<Annonce> additionalMotos = annonceRepository.findPopularAnnonces(
+                    "Moto",
+                    excludedIds,
+                    remaining);
+                recommandationGeneralesMoto.addAll(additionalMotos);
+            }
+
+            // Création des IDs à exclure pour les recommandations spécifiques
+            List<Long> excludedIds = new ArrayList<>();
+            recommandationGeneralesVoiture.forEach(a -> excludedIds.add(a.getAnnonceId()));
+            recommandationGeneralesMoto.forEach(a -> excludedIds.add(a.getAnnonceId()));
+
+            // Création de la liste de hashmaps pour la réponse
+            List<HashMap<String, List<Annonce>>> recommendations = new ArrayList<>();
+
+            // HashMap pour les recommandations générales
+            HashMap<String, List<Annonce>> generalMap = new HashMap<>();
+            List<Annonce> generalList = new ArrayList<>();
+            generalList.addAll(recommandationGeneralesVoiture);
+            generalList.addAll(recommandationGeneralesMoto);
+            Collections.shuffle(generalList);
+            generalMap.put("general", generalList);
+            recommendations.add(generalMap);
+
+            // Récupération des recommandations spécifiques par type
+            List<Annonce> recommandationVoitures = annonceRepository.findPopularAnnonces(
+                    "Voiture",
+                    excludedIds,
+                    nbAnnonces);
+
+            // Compléter si nécessaire
+            if (recommandationVoitures.size() < nbAnnonces) {
+                List<Long> newExcludedIds = new ArrayList<>(excludedIds);
+                newExcludedIds.addAll(recommandationVoitures.stream()
+                    .map(Annonce::getAnnonceId)
+                    .collect(Collectors.toList()));
+                int remaining = nbAnnonces - recommandationVoitures.size();
+                List<Annonce> additionalVoitures = annonceRepository.findPopularAnnonces(
+                    "Voiture",
+                    newExcludedIds,
+                    remaining);
+                recommandationVoitures.addAll(additionalVoitures);
+            }
+
+            List<Annonce> recommandationMotos = annonceRepository.findPopularAnnonces(
+                    "Moto",
+                    excludedIds,
+                    nbAnnonces);
+
+            // Compléter si nécessaire
+            if (recommandationMotos.size() < nbAnnonces) {
+                List<Long> newExcludedIds = new ArrayList<>(excludedIds);
+                newExcludedIds.addAll(recommandationMotos.stream()
+                    .map(Annonce::getAnnonceId)
+                    .collect(Collectors.toList()));
+                int remaining = nbAnnonces - recommandationMotos.size();
+                List<Annonce> additionalMotos = annonceRepository.findPopularAnnonces(
+                    "Moto",
+                    newExcludedIds,
+                    remaining);
+                recommandationMotos.addAll(additionalMotos);
+            }
+
+            // HashMap pour les voitures
+            HashMap<String, List<Annonce>> voituresMap = new HashMap<>();
+            voituresMap.put("voitures", recommandationVoitures);
+            recommendations.add(voituresMap);
+
+            // HashMap pour les motos
+            HashMap<String, List<Annonce>> motosMap = new HashMap<>();
+            motosMap.put("motos", recommandationMotos);
+            recommendations.add(motosMap);
+
+            response.setData(recommendations);
+            response.setMessage("Recommandations récupérées avec succès");
             return ResponseEntity.ok(response);
-            
+
         } catch (Exception e) {
-            response.setMessage("Erreur lors de la récupération des annonces populaires: " + e.getMessage());
+            response.setMessage("Erreur lors de la récupération des recommandations: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
