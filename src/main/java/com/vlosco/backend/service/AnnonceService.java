@@ -808,4 +808,59 @@ public class AnnonceService {
         return score;
     }
 
+    public ResponseEntity<ResponseDTO<List<Annonce>>> getPopularAnnonces(String type, Integer nbAnnonces, List<Long> excludeIds) {
+        ResponseDTO<List<Annonce>> response = new ResponseDTO<>();
+        try {
+            List<Annonce> popularAnnonces;
+            
+            if ("general".equals(type)) {
+                // Pour le type général, récupérer un mix équilibré de voitures et motos
+                int nbParType = nbAnnonces / 2;
+                
+                // Récupérer les voitures populaires
+                List<Annonce> voitures = annonceRepository.findPopularAnnoncesByType(
+                    "VOITURE",
+                    nbParType,
+                    excludeIds
+                );
+                
+                // Récupérer les motos populaires
+                List<Annonce> motos = annonceRepository.findPopularAnnoncesByType(
+                    "MOTO",
+                    nbParType,
+                    excludeIds
+                );
+                
+                popularAnnonces = new ArrayList<>();
+                popularAnnonces.addAll(voitures);
+                popularAnnonces.addAll(motos);
+                
+                // Mélanger les résultats pour une meilleure distribution
+                Collections.shuffle(popularAnnonces);
+                
+            } else {
+                // Pour un type spécifique (voitures ou motos)
+                String vehicleType = "voitures".equals(type) ? "VOITURE" : "MOTO";
+                popularAnnonces = annonceRepository.findPopularAnnoncesByType(
+                    vehicleType,
+                    nbAnnonces,
+                    excludeIds
+                );
+            }
+            
+            if (popularAnnonces.isEmpty()) {
+                response.setMessage("Aucune annonce populaire trouvée");
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+            }
+            
+            response.setData(popularAnnonces);
+            response.setMessage("Annonces populaires récupérées avec succès");
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            response.setMessage("Erreur lors de la récupération des annonces populaires: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
 }

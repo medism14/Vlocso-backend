@@ -243,4 +243,22 @@ public class AnnonceController {
                 return annonceService.findSimilarAnnonces(annonceId, nbAnnonces);
         }
 
+        @Operation(summary = "Obtenir les annonces populaires", 
+                  description = "Retourne les annonces les plus populaires pour les utilisateurs non connectés")
+        @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Annonces populaires récupérées avec succès"),
+            @ApiResponse(responseCode = "204", description = "Aucune annonce populaire trouvée"),
+            @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
+        })
+        @GetMapping("/popular")
+        public ResponseEntity<ResponseDTO<List<Annonce>>> getPopularAnnonces(
+            @Parameter(description = "Type de véhicule (general, voitures, motos)") 
+            @RequestParam(defaultValue = "general") String type,
+            @Parameter(description = "Nombre d'annonces à retourner") 
+            @RequestParam(defaultValue = "12") Integer nbAnnonces,
+            @Parameter(description = "IDs des annonces à exclure") 
+            @RequestParam(required = false) List<Long> excludeIds) {
+            return annonceService.getPopularAnnonces(type, nbAnnonces, excludeIds);
+        }
+
 }
