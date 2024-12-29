@@ -12,12 +12,10 @@ com/vlosco/backend/enums/AnnonceState.class
 com/vlosco/backend/dto/UserUpdatePasswordDto.class
 com/vlosco/backend/service/PasswordService.class
 com/vlosco/backend/dto/JwtResponse.class
-com/vlosco/backend/controller/ImageController.class
 com/vlosco/backend/model/AuthProvider.class
 com/vlosco/backend/repository/UserRepository.class
 com/vlosco/backend/service/AuthProviderService.class
 com/vlosco/backend/dto/UpdateAuthProviderDTO.class
-com/vlosco/backend/repository/AnnonceRepository.class
 com/vlosco/backend/dto/VehicleUpdateDTO.class
 com/vlosco/backend/service/EmailService.class
 com/vlosco/backend/enums/ConditionVehicle.class
@@ -88,7 +86,6 @@ com/vlosco/backend/model/Image.class
 com/vlosco/backend/dto/UpdateProviderDTO.class
 com/vlosco/backend/enums/UserRole.class
 com/vlosco/backend/enums/TypeGearBoxVehicle.class
-com/vlosco/backend/service/ImageService.class
 com/vlosco/backend/model/Provider.class
 com/vlosco/backend/dto/MessageResponseDTO.class
 com/vlosco/backend/repository/RefreshTokensBlacklistRepository.class

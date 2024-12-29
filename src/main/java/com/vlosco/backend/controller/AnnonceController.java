@@ -4,6 +4,7 @@
  */
 package com.vlosco.backend.controller;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -250,15 +251,11 @@ public class AnnonceController {
             @ApiResponse(responseCode = "204", description = "Aucune annonce populaire trouvée"),
             @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
         })
-        @GetMapping("/popular")
-        public ResponseEntity<ResponseDTO<List<Annonce>>> getPopularAnnonces(
-            @Parameter(description = "Type de véhicule (general, voitures, motos)") 
-            @RequestParam(defaultValue = "general") String type,
-            @Parameter(description = "Nombre d'annonces à retourner") 
-            @RequestParam(defaultValue = "12") Integer nbAnnonces,
-            @Parameter(description = "IDs des annonces à exclure") 
-            @RequestParam(required = false) List<Long> excludeIds) {
-            return annonceService.getPopularAnnonces(type, nbAnnonces, excludeIds);
+        @GetMapping("/recommandation-not-connected")
+        public ResponseEntity<ResponseDTO<List<HashMap<String, List<Annonce>>>>> recommandationUserNotConnected(
+            @Parameter(description = "Nombre d'annonces à retourner pour chaque partie") 
+            @RequestParam(defaultValue = "12") Integer nbAnnonces) {
+            return annonceService.recommandationUserNotConnected(nbAnnonces);
         }
 
 }
