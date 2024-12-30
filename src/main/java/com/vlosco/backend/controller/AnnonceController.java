@@ -93,7 +93,7 @@ public class AnnonceController {
                         @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
         })
         @PostMapping("/recommandation/{userId}")
-        public ResponseEntity<ResponseDTO<List<Annonce>>> getRecommandationsUser(
+        public ResponseEntity<ResponseDTO<List<AnnonceWithUserDTO>>> getRecommandationsUser(
                         @Parameter(description = "ID de l'utilisateur") @PathVariable Long userId,
                         @Parameter(description = "Type de véhicule (valeurs possibles: 'general', 'voitures', 'motos')") @RequestParam String type,
                         @Parameter(description = "Nombre d'annonces à recommander (12 en général)") @RequestParam Integer nbAnnonces,
@@ -147,7 +147,7 @@ public class AnnonceController {
                         @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
         })
         @PostMapping("/search")
-        public ResponseEntity<ResponseDTO<List<Annonce>>> searchAnnonces(
+        public ResponseEntity<ResponseDTO<List<AnnonceWithUserDTO>>> searchAnnonces(
                         @Parameter(description = "Critères de recherche") @RequestBody AnnonceSearchDTO searchDTO) {
                 return annonceService.searchAnnonces(
                                 searchDTO.getSearchText(),
@@ -238,7 +238,7 @@ public class AnnonceController {
                         @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
         })
         @GetMapping("/similar/{annonceId}")
-        public ResponseEntity<ResponseDTO<List<Annonce>>> getSimilarAnnonces(
+        public ResponseEntity<ResponseDTO<List<AnnonceWithUserDTO>>> getSimilarAnnonces(
                         @Parameter(description = "ID de l'annonce de référence") @PathVariable Long annonceId,
                         @Parameter(description = "Nombre d'annonces similaires à retourner") @RequestParam(defaultValue = "4") Integer nbAnnonces) {
                 return annonceService.findSimilarAnnonces(annonceId, nbAnnonces);
@@ -252,7 +252,7 @@ public class AnnonceController {
             @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
         })
         @GetMapping("/recommandation-not-connected")
-        public ResponseEntity<ResponseDTO<List<HashMap<String, List<Annonce>>>>> recommandationUserNotConnected(
+        public ResponseEntity<ResponseDTO<List<HashMap<String, List<AnnonceWithUserDTO>>>>> recommandationUserNotConnected(
             @Parameter(description = "Nombre d'annonces à retourner pour chaque partie") 
             @RequestParam(defaultValue = "12") Integer nbAnnonces) {
             return annonceService.recommandationUserNotConnected(nbAnnonces);

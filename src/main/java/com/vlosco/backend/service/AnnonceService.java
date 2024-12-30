@@ -140,9 +140,9 @@ public class AnnonceService {
      * @param type   Type de véhicule ("Voiture", "Moto" ou null pour général)
      * @return ResponseEntity contenant la liste des annonces recommandées
      */
-    public ResponseEntity<ResponseDTO<List<Annonce>>> recommandationUser(Long userId, String type, Integer nbAnnonces,
+    public ResponseEntity<ResponseDTO<List<AnnonceWithUserDTO>>> recommandationUser(Long userId, String type, Integer nbAnnonces,
             List<Long> excludeIds) {
-        ResponseDTO<List<Annonce>> response = new ResponseDTO<>();
+        ResponseDTO<List<AnnonceWithUserDTO>> response = new ResponseDTO<>();
         try {
             long totalAnnonces = annonceRepository.count();
             long totalInteractions = interactionRepository.count();
@@ -170,7 +170,13 @@ public class AnnonceService {
                 }
 
                 Collections.shuffle(randomAnnonces);
-                response.setData(randomAnnonces.stream().limit(nbAnnonces).collect(Collectors.toList()));
+                // Convertir en AnnonceWithUserDTO
+                List<AnnonceWithUserDTO> annonceDTOs = randomAnnonces.stream()
+                        .limit(nbAnnonces)
+                        .map(annonce -> new AnnonceWithUserDTO(annonce, annonce.getVendor()))
+                        .collect(Collectors.toList());
+                
+                response.setData(annonceDTOs);
                 response.setMessage("Recommandations aléatoires récupérées avec succès");
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
@@ -224,7 +230,12 @@ public class AnnonceService {
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
 
-            response.setData(recommendedAnnonces);
+            // Convertir la liste d'Annonce en AnnonceWithUserDTO
+            List<AnnonceWithUserDTO> recommendedAnnonceDTOs = recommendedAnnonces.stream()
+                    .map(annonce -> new AnnonceWithUserDTO(annonce, annonce.getVendor()))
+                    .collect(Collectors.toList());
+
+            response.setData(recommendedAnnonceDTOs);
             response.setMessage("Recommandations récupérées avec succès");
             return new ResponseEntity<>(response, HttpStatus.OK);
 
@@ -459,15 +470,17 @@ public class AnnonceService {
     /**
      * Recherche des annonces par mot-clé dans le titre.
      * 
-     * @param keyword Mot-clé à rechercher dans les annonces
+     * @param searchText Texte à rechercher dans les annonces
+     * @param excludedIds IDs des annonces à exclure
+     * @param nbAnnonces Nombre d'annonces à retourner
      * @return ResponseEntity contenant:
      *         - 200 OK: Liste des annonces correspondantes avec message de succès
      *         - 204 NO_CONTENT: Si aucune annonce ne correspond au mot-clé
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
-    public ResponseEntity<ResponseDTO<List<Annonce>>> searchAnnonces(String searchText, String[] excludedIds,
+    public ResponseEntity<ResponseDTO<List<AnnonceWithUserDTO>>> searchAnnonces(String searchText, String[] excludedIds,
             Integer nbAnnonces) {
-        ResponseDTO<List<Annonce>> response = new ResponseDTO<>();
+        ResponseDTO<List<AnnonceWithUserDTO>> response = new ResponseDTO<>();
         try {
             Map<String, String> searchCriteria = SearchUtils.analyzeSearchText(searchText != null ? searchText : "");
 
@@ -546,10 +559,12 @@ public class AnnonceService {
                 }
             }
 
-            // Conversion en liste et mélange aléatoire
-            List<Annonce> finalAnnonces = new ArrayList<>(allAnnonces);
+            // Conversion en liste et conversion en DTO
+            List<AnnonceWithUserDTO> finalAnnonceDTOs = allAnnonces.stream()
+                    .map(annonce -> new AnnonceWithUserDTO(annonce, annonce.getVendor()))
+                    .collect(Collectors.toList());
 
-            response.setData(finalAnnonces);
+            response.setData(finalAnnonceDTOs);
             response.setMessage("Recherche effectuée avec succès");
             return new ResponseEntity<>(response, HttpStatus.OK);
 
@@ -704,8 +719,8 @@ public class AnnonceService {
         }
     }
 
-    public ResponseEntity<ResponseDTO<List<Annonce>>> findSimilarAnnonces(Long annonceId, Integer nbAnnonces) {
-        ResponseDTO<List<Annonce>> response = new ResponseDTO<>();
+    public ResponseEntity<ResponseDTO<List<AnnonceWithUserDTO>>> findSimilarAnnonces(Long annonceId, Integer nbAnnonces) {
+        ResponseDTO<List<AnnonceWithUserDTO>> response = new ResponseDTO<>();
         try {
             Optional<Annonce> referenceAnnonce = annonceRepository.findById(annonceId);
             if (referenceAnnonce.isEmpty()) {
@@ -748,7 +763,12 @@ public class AnnonceService {
                     .limit(nbAnnonces)
                     .collect(Collectors.toList());
 
-            response.setData(finalAnnonces);
+            // Conversion en liste et conversion en DTO
+            List<AnnonceWithUserDTO> finalAnnonceDTOs = finalAnnonces.stream()
+                    .map(annonce -> new AnnonceWithUserDTO(annonce, annonce.getVendor()))
+                    .collect(Collectors.toList());
+
+            response.setData(finalAnnonceDTOs);
             response.setMessage("Annonces similaires trouvées avec succès");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
@@ -813,9 +833,9 @@ public class AnnonceService {
         return score;
     }
 
-    public ResponseEntity<ResponseDTO<List<HashMap<String, List<Annonce>>>>> recommandationUserNotConnected(
+    public ResponseEntity<ResponseDTO<List<HashMap<String, List<AnnonceWithUserDTO>>>>> recommandationUserNotConnected(
             Integer nbAnnonces) {
-        ResponseDTO<List<HashMap<String, List<Annonce>>>> response = new ResponseDTO<>();
+        ResponseDTO<List<HashMap<String, List<AnnonceWithUserDTO>>>> response = new ResponseDTO<>();
         try {
             if (nbAnnonces == null || nbAnnonces <= 0) {
                 nbAnnonces = 12;
@@ -830,100 +850,94 @@ public class AnnonceService {
                     "Voiture",
                     nbVoitures);
 
-            // Si on n'a pas assez d'annonces populaires, on complète avec des annonces aléatoires
-            if (recommandationGeneralesVoiture.size() < nbVoitures) {
-                List<Long> excludedIds = recommandationGeneralesVoiture.stream()
-                    .map(Annonce::getAnnonceId)
+            // Conversion en DTO pour les voitures
+            List<AnnonceWithUserDTO> recommandationGeneralesVoitureDTOs = recommandationGeneralesVoiture.stream()
+                    .map(annonce -> new AnnonceWithUserDTO(annonce, annonce.getVendor()))
                     .collect(Collectors.toList());
-                int remaining = nbVoitures - recommandationGeneralesVoiture.size();
+
+            // Si on n'a pas assez d'annonces populaires, on complète avec des annonces aléatoires
+            if (recommandationGeneralesVoitureDTOs.size() < nbVoitures) {
+                List<Long> excludedIds = recommandationGeneralesVoitureDTOs.stream()
+                        .map(dto -> dto.getAnnonce().getAnnonceId())
+                        .collect(Collectors.toList());
+                int remaining = nbVoitures - recommandationGeneralesVoitureDTOs.size();
                 List<Annonce> additionalVoitures = annonceRepository.findPopularAnnonces(
-                    "Voiture",
-                    excludedIds,
-                    remaining);
-                recommandationGeneralesVoiture.addAll(additionalVoitures);
+                        "Voiture",
+                        excludedIds,
+                        remaining);
+                List<AnnonceWithUserDTO> additionalVoituresDTOs = additionalVoitures.stream()
+                        .map(annonce -> new AnnonceWithUserDTO(annonce, annonce.getVendor()))
+                        .collect(Collectors.toList());
+                recommandationGeneralesVoitureDTOs.addAll(additionalVoituresDTOs);
             }
 
             List<Annonce> recommandationGeneralesMoto = annonceRepository.findPopularAnnonces(
                     "Moto",
                     nbMotos);
 
-            // Même chose pour les motos
-            if (recommandationGeneralesMoto.size() < nbMotos) {
-                List<Long> excludedIds = recommandationGeneralesMoto.stream()
-                    .map(Annonce::getAnnonceId)
+            // Conversion en DTO pour les motos
+            List<AnnonceWithUserDTO> recommandationGeneralesMotoDTOs = recommandationGeneralesMoto.stream()
+                    .map(annonce -> new AnnonceWithUserDTO(annonce, annonce.getVendor()))
                     .collect(Collectors.toList());
-                int remaining = nbMotos - recommandationGeneralesMoto.size();
+
+            // Même chose pour les motos
+            if (recommandationGeneralesMotoDTOs.size() < nbMotos) {
+                List<Long> excludedIds = recommandationGeneralesMotoDTOs.stream()
+                        .map(dto -> dto.getAnnonce().getAnnonceId())
+                        .collect(Collectors.toList());
+                int remaining = nbMotos - recommandationGeneralesMotoDTOs.size();
                 List<Annonce> additionalMotos = annonceRepository.findPopularAnnonces(
-                    "Moto",
-                    excludedIds,
-                    remaining);
-                recommandationGeneralesMoto.addAll(additionalMotos);
+                        "Moto",
+                        excludedIds,
+                        remaining);
+                List<AnnonceWithUserDTO> additionalMotosDTOs = additionalMotos.stream()
+                        .map(annonce -> new AnnonceWithUserDTO(annonce, annonce.getVendor()))
+                        .collect(Collectors.toList());
+                recommandationGeneralesMotoDTOs.addAll(additionalMotosDTOs);
             }
 
             // Création des IDs à exclure pour les recommandations spécifiques
             List<Long> excludedIds = new ArrayList<>();
-            recommandationGeneralesVoiture.forEach(a -> excludedIds.add(a.getAnnonceId()));
-            recommandationGeneralesMoto.forEach(a -> excludedIds.add(a.getAnnonceId()));
+            recommandationGeneralesVoitureDTOs.forEach(dto -> excludedIds.add(dto.getAnnonce().getAnnonceId()));
+            recommandationGeneralesMotoDTOs.forEach(dto -> excludedIds.add(dto.getAnnonce().getAnnonceId()));
 
             // Création de la liste de hashmaps pour la réponse
-            List<HashMap<String, List<Annonce>>> recommendations = new ArrayList<>();
+            List<HashMap<String, List<AnnonceWithUserDTO>>> recommendations = new ArrayList<>();
 
             // HashMap pour les recommandations générales
-            HashMap<String, List<Annonce>> generalMap = new HashMap<>();
-            List<Annonce> generalList = new ArrayList<>();
-            generalList.addAll(recommandationGeneralesVoiture);
-            generalList.addAll(recommandationGeneralesMoto);
+            HashMap<String, List<AnnonceWithUserDTO>> generalMap = new HashMap<>();
+            List<AnnonceWithUserDTO> generalList = new ArrayList<>();
+            generalList.addAll(recommandationGeneralesVoitureDTOs);
+            generalList.addAll(recommandationGeneralesMotoDTOs);
             Collections.shuffle(generalList);
             generalMap.put("general", generalList);
             recommendations.add(generalMap);
 
-            // Récupération des recommandations spécifiques par type
+            // Récupération et conversion des recommandations spécifiques par type
             List<Annonce> recommandationVoitures = annonceRepository.findPopularAnnonces(
                     "Voiture",
                     excludedIds,
                     nbAnnonces);
+            List<AnnonceWithUserDTO> recommandationVoituresDTOs = recommandationVoitures.stream()
+                    .map(annonce -> new AnnonceWithUserDTO(annonce, annonce.getVendor()))
+                    .collect(Collectors.toList());
 
-            // Compléter si nécessaire
-            if (recommandationVoitures.size() < nbAnnonces) {
-                List<Long> newExcludedIds = new ArrayList<>(excludedIds);
-                newExcludedIds.addAll(recommandationVoitures.stream()
-                    .map(Annonce::getAnnonceId)
-                    .collect(Collectors.toList()));
-                int remaining = nbAnnonces - recommandationVoitures.size();
-                List<Annonce> additionalVoitures = annonceRepository.findPopularAnnonces(
-                    "Voiture",
-                    newExcludedIds,
-                    remaining);
-                recommandationVoitures.addAll(additionalVoitures);
-            }
+            // HashMap pour les voitures
+            HashMap<String, List<AnnonceWithUserDTO>> voituresMap = new HashMap<>();
+            voituresMap.put("voitures", recommandationVoituresDTOs);
+            recommendations.add(voituresMap);
 
             List<Annonce> recommandationMotos = annonceRepository.findPopularAnnonces(
                     "Moto",
                     excludedIds,
                     nbAnnonces);
-
-            // Compléter si nécessaire
-            if (recommandationMotos.size() < nbAnnonces) {
-                List<Long> newExcludedIds = new ArrayList<>(excludedIds);
-                newExcludedIds.addAll(recommandationMotos.stream()
-                    .map(Annonce::getAnnonceId)
-                    .collect(Collectors.toList()));
-                int remaining = nbAnnonces - recommandationMotos.size();
-                List<Annonce> additionalMotos = annonceRepository.findPopularAnnonces(
-                    "Moto",
-                    newExcludedIds,
-                    remaining);
-                recommandationMotos.addAll(additionalMotos);
-            }
-
-            // HashMap pour les voitures
-            HashMap<String, List<Annonce>> voituresMap = new HashMap<>();
-            voituresMap.put("voitures", recommandationVoitures);
-            recommendations.add(voituresMap);
+            List<AnnonceWithUserDTO> recommandationMotosDTOs = recommandationMotos.stream()
+                    .map(annonce -> new AnnonceWithUserDTO(annonce, annonce.getVendor()))
+                    .collect(Collectors.toList());
 
             // HashMap pour les motos
-            HashMap<String, List<Annonce>> motosMap = new HashMap<>();
-            motosMap.put("motos", recommandationMotos);
+            HashMap<String, List<AnnonceWithUserDTO>> motosMap = new HashMap<>();
+            motosMap.put("motos", recommandationMotosDTOs);
             recommendations.add(motosMap);
 
             response.setData(recommendations);
