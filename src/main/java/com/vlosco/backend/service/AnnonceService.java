@@ -484,6 +484,7 @@ public class AnnonceService {
         try {
             Map<String, String> searchCriteria = SearchUtils.analyzeSearchText(searchText != null ? searchText : "");
 
+            String transaction = searchCriteria.get("annonce.transaction");
             String type = searchCriteria.get("vehicle.type");
             String mark = searchCriteria.get("vehicle.mark");
             String model = searchCriteria.get("vehicle.model");
@@ -500,7 +501,7 @@ public class AnnonceService {
 
             // Premier essai avec tous les critères
             List<Annonce> annonces = annonceRepository.searchAnnoncesAdvanced(
-                    type, mark, model, category, fuelType, color, city, year, excludedIds, limit);
+                    type, transaction, mark, model, category, fuelType, color, city, year, excludedIds, limit);
             allAnnonces.addAll(annonces);
 
             // Si on n'a pas atteint la limite, on fait des recherches progressivement plus
@@ -514,7 +515,7 @@ public class AnnonceService {
                 // Recherche sans la ville
                 if (city != null) {
                     annonces = annonceRepository.searchAnnoncesAdvanced(
-                            type, mark, model, category, fuelType, color, null, year, newExcludedIds, limit);
+                            type, transaction, mark, model, category, fuelType, color, null, year, newExcludedIds, limit);
                     allAnnonces.addAll(annonces);
                 }
 
@@ -524,28 +525,38 @@ public class AnnonceService {
                             .map(a -> a.getAnnonceId().toString())
                             .toArray(String[]::new);
                     annonces = annonceRepository.searchAnnoncesAdvanced(
-                            type, mark, model, category, fuelType, color, null, null, newExcludedIds, limit);
+                            type, transaction, mark, model, category, fuelType, color, null, null, newExcludedIds, limit);
                     allAnnonces.addAll(annonces);
                 }
 
-                // Recherche avec uniquement type et marque
+                // Recherche avec uniquement transaction, type et marque
                 if (allAnnonces.size() < limit
                         && (model != null || category != null || fuelType != null || color != null)) {
                     newExcludedIds = allAnnonces.stream()
                             .map(a -> a.getAnnonceId().toString())
                             .toArray(String[]::new);
                     annonces = annonceRepository.searchAnnoncesAdvanced(
-                            type, mark, null, null, null, null, null, null, newExcludedIds, limit);
+                            type, transaction, mark, null, null, null, null, null, null, newExcludedIds, limit);
                     allAnnonces.addAll(annonces);
                 }
 
-                // Recherche avec uniquement le type
+                // Recherche avec uniquement transaction et type
                 if (allAnnonces.size() < limit && mark != null) {
                     newExcludedIds = allAnnonces.stream()
                             .map(a -> a.getAnnonceId().toString())
                             .toArray(String[]::new);
                     annonces = annonceRepository.searchAnnoncesAdvanced(
-                            type, null, null, null, null, null, null, null, newExcludedIds, limit);
+                            type, transaction, null, null, null, null, null, null, null, newExcludedIds, limit);
+                    allAnnonces.addAll(annonces);
+                }
+
+                // Recherche avec uniquement transaction
+                if (allAnnonces.size() < limit && type != null) {
+                    newExcludedIds = allAnnonces.stream()
+                            .map(a -> a.getAnnonceId().toString())
+                            .toArray(String[]::new);
+                    annonces = annonceRepository.searchAnnoncesAdvanced(
+                            type, null, null, null, null, null, null, null, null, newExcludedIds, limit);
                     allAnnonces.addAll(annonces);
                 }
 

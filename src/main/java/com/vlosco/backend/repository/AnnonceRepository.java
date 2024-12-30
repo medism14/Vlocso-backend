@@ -121,6 +121,7 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
             AND (:color IS NULL OR v.color = :color)
             AND (:city IS NULL OR a.city = :city)
             AND (:year IS NULL OR v.year = :year)
+            AND (:transaction IS NULL OR a.transaction = :transaction)
             AND a.annonceState = 'ACTIVE'
             AND (COALESCE(:excludedIds, NULL) IS NULL OR a.annonceId NOT IN (:excludedIds))
                 ORDER BY a.createdAt DESC, a.premium DESC
@@ -128,6 +129,7 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
                 """)
     List<Annonce> searchAnnoncesAdvanced(
             @Param("type") String type,
+            @Param("transaction") String transaction,
             @Param("mark") String mark,
             @Param("model") String model,
             @Param("category") String category,

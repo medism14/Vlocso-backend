@@ -48,6 +48,9 @@ public class SearchUtils {
         // Couleurs
         KEYWORDS_MAPPING.put("vehicle.color", Arrays.asList(AnnonceData.COLOR_ITEMS));
 
+        // Transactions
+        KEYWORDS_MAPPING.put("annonce.transaction", Arrays.asList(AnnonceData.TRANSACTION_ITEMS));
+
         // Années (de 1950 à aujourd'hui)
         List<String> years = new ArrayList<>();
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
@@ -150,6 +153,12 @@ public class SearchUtils {
                      "tout dernier", "plus recent", "plus récent", "actuel",
                      "cette année", "annee en cours", "année en cours")
             .forEach(term -> NORMALIZED_TERMS.put(term, String.valueOf(Calendar.getInstance().get(Calendar.YEAR))));
+
+        // Normalisation des transactions
+        Arrays.asList("vente", "vendre", "buy", "sale", "selling")
+            .forEach(term -> NORMALIZED_TERMS.put(term, "Vente"));
+        Arrays.asList("location", "louer", "rent", "rental")
+            .forEach(term -> NORMALIZED_TERMS.put(term, "Location"));
     }
 
     public static Map<String, String> analyzeSearchText(String searchText) {
@@ -222,7 +231,7 @@ public class SearchUtils {
                 }
             }
         }
-
+       
         // Garder le texte original pour la recherche générale
         searchCriteria.put("searchText", searchText);
         

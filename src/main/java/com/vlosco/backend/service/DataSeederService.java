@@ -91,7 +91,7 @@ public class DataSeederService {
                         user.setLastName(lastName);
                         user.setEmail(firstName.toLowerCase() + "." + lastName.toLowerCase() + "@gmail.com");
                         user.setPassword(passwordService.hashPassword("password@123"));
-                        user.setPhoneNumber(faker.numerify("+33 " + (random.nextBoolean() ? "6" : "7") + "########"));
+                        user.setPhoneNumber(faker.numerify("+33 " + (random.nextBoolean() ? "6" : "7") + "## ## ## ##"));
                         user.setCity(faker.options().option(AnnonceData.CITY_ITEMS));
                         user.setBirthDate(LocalDate.now().minusYears(faker.number().numberBetween(25, 55)));
                         user.setEmailVerified(true);
@@ -217,7 +217,7 @@ public class DataSeederService {
                         int kmCount = faker.number().numberBetween(minKm, maxKm);
                         vehicleDetails.setKlm_counter(String.valueOf(kmCount));
                         annonceDetails.setCity(city);
-                        annonceDetails.setPhoneNumber(faker.numerify("+33 " + (random.nextBoolean() ? "6" : "7") + "########"));
+                        annonceDetails.setPhoneNumber(faker.numerify("+33 " + (random.nextBoolean() ? "6" : "7") + "## ## ## ##"));
                         annonceDetails.setUserId(users.get(random.nextInt(users.size())).getUserId());
                         annonceCreationDTO.setAnnonce(annonceDetails);
 
