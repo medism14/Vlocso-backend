@@ -140,7 +140,8 @@ public class AnnonceService {
      * @param type   Type de véhicule ("Voiture", "Moto" ou null pour général)
      * @return ResponseEntity contenant la liste des annonces recommandées
      */
-    public ResponseEntity<ResponseDTO<List<AnnonceWithUserDTO>>> recommandationUser(Long userId, String type, Integer nbAnnonces,
+    public ResponseEntity<ResponseDTO<List<AnnonceWithUserDTO>>> recommandationUser(Long userId, String type,
+            Integer nbAnnonces,
             List<Long> excludeIds) {
         ResponseDTO<List<AnnonceWithUserDTO>> response = new ResponseDTO<>();
         try {
@@ -175,7 +176,7 @@ public class AnnonceService {
                         .limit(nbAnnonces)
                         .map(annonce -> new AnnonceWithUserDTO(annonce, annonce.getVendor()))
                         .collect(Collectors.toList());
-                
+
                 response.setData(annonceDTOs);
                 response.setMessage("Recommandations aléatoires récupérées avec succès");
                 return new ResponseEntity<>(response, HttpStatus.OK);
@@ -470,38 +471,38 @@ public class AnnonceService {
     /**
      * Recherche des annonces par mot-clé dans le titre.
      * 
-     * @param searchText Texte à rechercher dans les annonces
+     * @param searchText  Texte à rechercher dans les annonces
      * @param excludedIds IDs des annonces à exclure
-     * @param nbAnnonces Nombre d'annonces à retourner
+     * @param nbAnnonces  Nombre d'annonces à retourner
      * @return ResponseEntity contenant:
      *         - 200 OK: Liste des annonces correspondantes avec message de succès
      *         - 204 NO_CONTENT: Si aucune annonce ne correspond au mot-clé
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
     public ResponseEntity<ResponseDTO<List<AnnonceWithUserDTO>>> searchAnnonces(String searchText, String[] excludedIds,
-            Integer nbAnnonces) {
+            Integer nbAnnonces, String sort, String filterTransaction, Integer minKilometrage, Integer maxKilometrage,
+            Double minPrice, Double maxPrice, String city, String filterMark, String filterModel) {
         ResponseDTO<List<AnnonceWithUserDTO>> response = new ResponseDTO<>();
         try {
             Map<String, String> searchCriteria = SearchUtils.analyzeSearchText(searchText != null ? searchText : "");
 
-            String transaction = searchCriteria.get("annonce.transaction");
+            String transaction = filterTransaction != null ? filterTransaction
+                    : searchCriteria.get("annonce.transaction");
             String type = searchCriteria.get("vehicle.type");
-            String mark = searchCriteria.get("vehicle.mark");
-            String model = searchCriteria.get("vehicle.model");
+            String mark = filterMark != null ? filterMark : searchCriteria.get("vehicle.mark");
+            String model = filterModel != null ? filterModel : searchCriteria.get("vehicle.model");
             String color = searchCriteria.get("vehicle.color");
             String category = searchCriteria.get("vehicle.category");
             String fuelType = searchCriteria.get("vehicle.fuelType");
             Integer year = searchCriteria.get("vehicle.year") != null
                     ? Integer.valueOf(searchCriteria.get("vehicle.year"))
                     : null;
-            String city = searchCriteria.get("vehicle.city");
-
             Integer limit = nbAnnonces != null ? nbAnnonces : 20;
             Set<Annonce> allAnnonces = new LinkedHashSet<>();
 
             // Premier essai avec tous les critères
-            List<Annonce> annonces = annonceRepository.searchAnnoncesAdvanced(
-                    type, transaction, mark, model, category, fuelType, color, city, year, excludedIds, limit);
+            List<Annonce> annonces = executeRequest(sort, type, transaction, mark, model, category, fuelType, color, city, year, minKilometrage,
+                    maxKilometrage, minPrice, maxPrice, excludedIds, limit);
             allAnnonces.addAll(annonces);
 
             // Si on n'a pas atteint la limite, on fait des recherches progressivement plus
@@ -512,51 +513,77 @@ public class AnnonceService {
                         .map(a -> a.getAnnonceId().toString())
                         .toArray(String[]::new);
 
-                // Recherche sans la ville
-                if (city != null) {
-                    annonces = annonceRepository.searchAnnoncesAdvanced(
-                            type, transaction, mark, model, category, fuelType, color, null, year, newExcludedIds, limit);
-                    allAnnonces.addAll(annonces);
-                }
-
                 // Recherche sans l'année
-                if (allAnnonces.size() < limit && year != null) {
-                    newExcludedIds = allAnnonces.stream()
-                            .map(a -> a.getAnnonceId().toString())
-                            .toArray(String[]::new);
-                    annonces = annonceRepository.searchAnnoncesAdvanced(
-                            type, transaction, mark, model, category, fuelType, color, null, null, newExcludedIds, limit);
+                if (year != null) {
+                    year = null;
+                    annonces = executeRequest(sort, type, transaction, mark, model, category, fuelType, color, city, year, minKilometrage,
+                            maxKilometrage, minPrice, maxPrice, newExcludedIds, limit - allAnnonces.size());
                     allAnnonces.addAll(annonces);
                 }
 
-                // Recherche avec uniquement transaction, type et marque
-                if (allAnnonces.size() < limit
-                        && (model != null || category != null || fuelType != null || color != null)) {
+                // Recherche sans la couleur
+                if (allAnnonces.size() < limit && color != null) {
                     newExcludedIds = allAnnonces.stream()
                             .map(a -> a.getAnnonceId().toString())
                             .toArray(String[]::new);
-                    annonces = annonceRepository.searchAnnoncesAdvanced(
-                            type, transaction, mark, null, null, null, null, null, null, newExcludedIds, limit);
+                    color = null;
+                    annonces = executeRequest(sort, type, transaction, mark, model, category, fuelType, color, city, year, minKilometrage,
+                            maxKilometrage, minPrice, maxPrice, newExcludedIds, limit - allAnnonces.size());
                     allAnnonces.addAll(annonces);
                 }
 
-                // Recherche avec uniquement transaction et type
-                if (allAnnonces.size() < limit && mark != null) {
+                // Recherche sans le modèle (si pas filtré explicitement)
+                if (allAnnonces.size() < limit && model != null && filterModel == null) {
                     newExcludedIds = allAnnonces.stream()
                             .map(a -> a.getAnnonceId().toString())
                             .toArray(String[]::new);
-                    annonces = annonceRepository.searchAnnoncesAdvanced(
-                            type, transaction, null, null, null, null, null, null, null, newExcludedIds, limit);
+                    model = null;
+                    annonces = executeRequest(sort, type, transaction, mark, model, category, fuelType, color, city, year, minKilometrage,
+                            maxKilometrage, minPrice, maxPrice, newExcludedIds, limit - allAnnonces.size());
                     allAnnonces.addAll(annonces);
                 }
 
-                // Recherche avec uniquement transaction
-                if (allAnnonces.size() < limit && type != null) {
+                // Recherche sans la catégorie
+                if (allAnnonces.size() < limit && category != null) {
                     newExcludedIds = allAnnonces.stream()
                             .map(a -> a.getAnnonceId().toString())
                             .toArray(String[]::new);
-                    annonces = annonceRepository.searchAnnoncesAdvanced(
-                            type, null, null, null, null, null, null, null, null, newExcludedIds, limit);
+                    category = null;
+                    annonces = executeRequest(sort, type, transaction, mark, model, category, fuelType, color, city, year, minKilometrage,
+                            maxKilometrage, minPrice, maxPrice, newExcludedIds, limit - allAnnonces.size());
+                    allAnnonces.addAll(annonces);
+                }
+
+                // Recherche sans le type de carburant
+                if (allAnnonces.size() < limit && fuelType != null) {
+                    newExcludedIds = allAnnonces.stream()
+                            .map(a -> a.getAnnonceId().toString())
+                            .toArray(String[]::new);
+                    fuelType = null;
+                    annonces = executeRequest(sort, type, transaction, mark, model, category, fuelType, color, city, year, minKilometrage,
+                            maxKilometrage, minPrice, maxPrice, newExcludedIds, limit - allAnnonces.size());
+                    allAnnonces.addAll(annonces);
+                }
+
+                // Recherche sans la marque (si pas filtrée explicitement)
+                if (allAnnonces.size() < limit && mark != null && filterMark == null) {
+                    newExcludedIds = allAnnonces.stream()
+                            .map(a -> a.getAnnonceId().toString())
+                            .toArray(String[]::new);
+                    mark = null;
+                    annonces = executeRequest(sort, type, transaction, mark, model, category, fuelType, color, city, year, minKilometrage,
+                            maxKilometrage, minPrice, maxPrice, newExcludedIds, limit - allAnnonces.size());
+                    allAnnonces.addAll(annonces);
+                }
+
+                // Recherche sans la transaction
+                if (allAnnonces.size() < limit && transaction != null && filterTransaction == null) {
+                    newExcludedIds = allAnnonces.stream()
+                            .map(a -> a.getAnnonceId().toString())
+                            .toArray(String[]::new);
+                    transaction = null;
+                    annonces = executeRequest(sort, type, transaction, mark, model, category, fuelType, color, city, year, minKilometrage,
+                            maxKilometrage, minPrice, maxPrice, newExcludedIds, limit - allAnnonces.size());
                     allAnnonces.addAll(annonces);
                 }
 
@@ -583,6 +610,28 @@ public class AnnonceService {
             e.printStackTrace();
             response.setMessage("Une erreur est survenue lors de la recherche : " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public List<Annonce> executeRequest(String sort, String type, String transaction, String mark, String model, String category, 
+            String fuelType, String color, String city, Integer year, Integer minKilometrage,
+            Integer maxKilometrage, Double minPrice, Double maxPrice, String[] excludedIds, Integer limit) {
+        
+        if ("price_asc".equals(sort)) {
+            return annonceRepository.searchAnnoncesAdvancedPriceAsc(type, transaction, mark, model, category, fuelType, color, city, year, minKilometrage,
+                    maxKilometrage, minPrice, maxPrice, excludedIds, limit);
+        } else if ("price_desc".equals(sort)) {
+            return annonceRepository.searchAnnoncesAdvancedPriceDesc(type, transaction, mark, model, category, fuelType, color, city, year, minKilometrage,
+                    maxKilometrage, minPrice, maxPrice, excludedIds, limit);
+        } else if ("date_asc".equals(sort)) {
+            return annonceRepository.searchAnnoncesAdvancedDateAsc(type, transaction, mark, model, category, fuelType, color, city, year, minKilometrage,
+                    maxKilometrage, minPrice, maxPrice, excludedIds, limit);
+        } else if ("date_desc".equals(sort)) {
+            return annonceRepository.searchAnnoncesAdvancedDateDesc(type, transaction, mark, model, category, fuelType, color, city, year, minKilometrage,
+                    maxKilometrage, minPrice, maxPrice, excludedIds, limit);
+        } else {
+            return annonceRepository.searchAnnoncesAdvanced(type, transaction, mark, model, category, fuelType, color, city, year, minKilometrage,
+                    maxKilometrage, minPrice, maxPrice, excludedIds, limit);
         }
     }
 
@@ -730,7 +779,8 @@ public class AnnonceService {
         }
     }
 
-    public ResponseEntity<ResponseDTO<List<AnnonceWithUserDTO>>> findSimilarAnnonces(Long annonceId, Integer nbAnnonces) {
+    public ResponseEntity<ResponseDTO<List<AnnonceWithUserDTO>>> findSimilarAnnonces(Long annonceId,
+            Integer nbAnnonces) {
         ResponseDTO<List<AnnonceWithUserDTO>> response = new ResponseDTO<>();
         try {
             Optional<Annonce> referenceAnnonce = annonceRepository.findById(annonceId);
@@ -866,7 +916,8 @@ public class AnnonceService {
                     .map(annonce -> new AnnonceWithUserDTO(annonce, annonce.getVendor()))
                     .collect(Collectors.toList());
 
-            // Si on n'a pas assez d'annonces populaires, on complète avec des annonces aléatoires
+            // Si on n'a pas assez d'annonces populaires, on complète avec des annonces
+            // aléatoires
             if (recommandationGeneralesVoitureDTOs.size() < nbVoitures) {
                 List<Long> excludedIds = recommandationGeneralesVoitureDTOs.stream()
                         .map(dto -> dto.getAnnonce().getAnnonceId())

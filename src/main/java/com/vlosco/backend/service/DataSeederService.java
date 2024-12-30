@@ -21,6 +21,7 @@ import com.vlosco.backend.repository.VehicleRepository;
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -80,13 +81,70 @@ public class DataSeederService {
         @Transactional
         private void seedUsersInBatches() {
                 List<User> userBatch = new ArrayList<>();
-                String[] firstNames = {"Thomas", "Nicolas", "Julien", "Pierre", "Marie", "Sophie", "Julie", "Emma", "Lucas", "Hugo"};
-                String[] lastNames = {"Martin", "Bernard", "Dubois", "Petit", "Robert", "Richard", "Durand", "Moreau", "Simon", "Laurent"};
+                Map<String, String> firstNamesMap = new HashMap<>();
+                List<String> namesMap = new ArrayList<>();
+                firstNamesMap.put("Thomas", "https://img.freepik.com/vecteurs-premium/vecteur-icone-homme-affaires_52756-255.jpg");
+                firstNamesMap.put("Nicolas", "https://img.freepik.com/vecteurs-premium/vecteur-icone-homme-affaires_52756-255.jpg");
+                firstNamesMap.put("Julien", "https://img.freepik.com/vecteurs-premium/vecteur-icone-homme-affaires_52756-255.jpg");
+                firstNamesMap.put("Pierre", "https://img.freepik.com/vecteurs-premium/vecteur-icone-homme-affaires_52756-255.jpg");
+                firstNamesMap.put("Marie", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzPRQ6LprnPzvvP-_vVO_nhSokwda8CMsnwQ&s");
+                firstNamesMap.put("Sophie", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzPRQ6LprnPzvvP-_vVO_nhSokwda8CMsnwQ&s");
+                firstNamesMap.put("Julie", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzPRQ6LprnPzvvP-_vVO_nhSokwda8CMsnwQ&s");
+                firstNamesMap.put("Emma", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzPRQ6LprnPzvvP-_vVO_nhSokwda8CMsnwQ&s");
+                firstNamesMap.put("Lucas", "https://img.freepik.com/vecteurs-premium/vecteur-icone-homme-affaires_52756-255.jpg");
+                firstNamesMap.put("Hugo", "https://img.freepik.com/vecteurs-premium/vecteur-icone-homme-affaires_52756-255.jpg");
+                firstNamesMap.put("Alice", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzPRQ6LprnPzvvP-_vVO_nhSokwda8CMsnwQ&s");
+                firstNamesMap.put("Léa", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzPRQ6LprnPzvvP-_vVO_nhSokwda8CMsnwQ&s");
+                firstNamesMap.put("Chloé", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzPRQ6LprnPzvvP-_vVO_nhSokwda8CMsnwQ&s");
+                firstNamesMap.put("Maxime", "https://img.freepik.com/vecteurs-premium/vecteur-icone-homme-affaires_52756-255.jpg");
+                firstNamesMap.put("Antoine", "https://img.freepik.com/vecteurs-premium/vecteur-icone-homme-affaires_52756-255.jpg");
+                firstNamesMap.put("Clara", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzPRQ6LprnPzvvP-_vVO_nhSokwda8CMsnwQ&s");
+                firstNamesMap.put("Gabriel", "https://img.freepik.com/vecteurs-premium/vecteur-icone-homme-affaires_52756-255.jpg");
+                firstNamesMap.put("Louis", "https://img.freepik.com/vecteurs-premium/vecteur-icone-homme-affaires_52756-255.jpg");
+                firstNamesMap.put("Inès", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzPRQ6LprnPzvvP-_vVO_nhSokwda8CMsnwQ&s");
+                firstNamesMap.put("Émilie", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzPRQ6LprnPzvvP-_vVO_nhSokwda8CMsnwQ&s");
+                firstNamesMap.put("Victor", "https://img.freepik.com/vecteurs-premium/vecteur-icone-homme-affaires_52756-255.jpg");
+                firstNamesMap.put("Noah", "https://img.freepik.com/vecteurs-premium/vecteur-icone-homme-affaires_52756-255.jpg");
+                firstNamesMap.put("Camille", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzPRQ6LprnPzvvP-_vVO_nhSokwda8CMsnwQ&s");
+                firstNamesMap.put("Juliette", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzPRQ6LprnPzvvP-_vVO_nhSokwda8CMsnwQ&s");
+                firstNamesMap.put("Théo", "https://img.freepik.com/vecteurs-premium/vecteur-icone-homme-affaires_52756-255.jpg");
+                firstNamesMap.put("Mathilde", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzPRQ6LprnPzvvP-_vVO_nhSokwda8CMsnwQ&s");
+                firstNamesMap.put("Raphaël", "https://img.freepik.com/vecteurs-premium/vecteur-icone-homme-affaires_52756-255.jpg");
+                firstNamesMap.put("Zoé", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzPRQ6LprnPzvvP-_vVO_nhSokwda8CMsnwQ&s");
+
+                namesMap.add("Dupont");
+                namesMap.add("Martin");
+                namesMap.add("Bernard");
+                namesMap.add("Leroy");
+                namesMap.add("Moreau");
+                namesMap.add("Garnier");
+                namesMap.add("Rousseau");
+                namesMap.add("Gauthier");
+                namesMap.add("Chevalier");
+                namesMap.add("Lemoine");
+                namesMap.add("Boucher");
+                namesMap.add("Pichon");
+                namesMap.add("Collet");
+                namesMap.add("Lefevre");
+                namesMap.add("Blanc");
+                namesMap.add("Giraud");
+                namesMap.add("Dufour");
+                namesMap.add("Bourgeois");
+                namesMap.add("Leroux");
+                namesMap.add("Lemoine");
+                namesMap.add("Fournier");
+                namesMap.add("Gauthier");
+                namesMap.add("Renaud");
+                namesMap.add("Leroy");
+                namesMap.add("Marchand");
+                
+                List<String> firstNames = new ArrayList<>(firstNamesMap.keySet());
                 
                 for (int i = 0; i < 2000; i++) {
                         User user = new User();
-                        String firstName = firstNames[random.nextInt(firstNames.length)];
-                        String lastName = lastNames[random.nextInt(lastNames.length)];
+                        String firstName = firstNames.get(random.nextInt(firstNames.size()));
+                        String lastName = namesMap.get(random.nextInt(namesMap.size()));
+                        
                         user.setFirstName(firstName);
                         user.setLastName(lastName);
                         user.setEmail(firstName.toLowerCase() + "." + lastName.toLowerCase() + "@gmail.com");
@@ -97,6 +155,8 @@ public class DataSeederService {
                         user.setEmailVerified(true);
                         user.setRole(UserRole.USER);
                         user.setType(UserType.REGULAR);
+                        user.setUrlImageUser(firstNamesMap.get(firstName));
+                        
                         userBatch.add(user);
 
                         if (userBatch.size() >= BATCH_SIZE) {

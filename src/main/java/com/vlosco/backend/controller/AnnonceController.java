@@ -26,6 +26,7 @@ import com.vlosco.backend.dto.AnnonceUpdateDTO;
 import com.vlosco.backend.dto.AnnonceWithUserDTO;
 import com.vlosco.backend.dto.PremiumAnnonceDTO;
 import com.vlosco.backend.dto.ResponseDTO;
+import com.vlosco.backend.enums.SortSearch;
 import com.vlosco.backend.model.Annonce;
 import com.vlosco.backend.service.AnnonceService;
 import com.vlosco.backend.service.ImageService;
@@ -148,11 +149,29 @@ public class AnnonceController {
         })
         @PostMapping("/search")
         public ResponseEntity<ResponseDTO<List<AnnonceWithUserDTO>>> searchAnnonces(
-                        @Parameter(description = "Critères de recherche") @RequestBody AnnonceSearchDTO searchDTO) {
+                        @Parameter(description = "Critères de recherche") @RequestBody AnnonceSearchDTO searchDTO,
+                        @Parameter(description = "Critère de tri") @RequestParam(required = false) String sort,
+                        @Parameter(description = "Type de transaction") @RequestParam(required = false) String transaction,
+                        @Parameter(description = "Kilométrage minimum") @RequestParam(required = false) Integer minKilometrage,
+                        @Parameter(description = "Kilométrage maximum") @RequestParam(required = false) Integer maxKilometrage,
+                        @Parameter(description = "Prix minimum") @RequestParam(required = false) Double minPrice,
+                        @Parameter(description = "Prix maximum") @RequestParam(required = false) Double maxPrice,
+                        @Parameter(description = "Ville") @RequestParam(required = false) String city,
+                        @Parameter(description = "Marque du véhicule") @RequestParam(required = false) String marque,
+                        @Parameter(description = "Model du véhicule") @RequestParam(required = false) String model) {
                 return annonceService.searchAnnonces(
                                 searchDTO.getSearchText(),
                                 searchDTO.getExcludedIds(),
-                                searchDTO.getNbAnnonces());
+                                searchDTO.getNbAnnonces(),
+                                sort,
+                                transaction,
+                                minKilometrage,
+                                maxKilometrage,
+                                minPrice,
+                                maxPrice,
+                                city,
+                                marque,
+                                model);
         }
 
         @Operation(summary = "Filtrer par catégorie", description = "Filtre les annonces par type de transaction")
@@ -244,18 +263,16 @@ public class AnnonceController {
                 return annonceService.findSimilarAnnonces(annonceId, nbAnnonces);
         }
 
-        @Operation(summary = "Obtenir les annonces populaires", 
-                  description = "Retourne les annonces les plus populaires pour les utilisateurs non connectés")
+        @Operation(summary = "Obtenir les annonces populaires", description = "Retourne les annonces les plus populaires pour les utilisateurs non connectés")
         @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Annonces populaires récupérées avec succès"),
-            @ApiResponse(responseCode = "204", description = "Aucune annonce populaire trouvée"),
-            @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
+                        @ApiResponse(responseCode = "200", description = "Annonces populaires récupérées avec succès"),
+                        @ApiResponse(responseCode = "204", description = "Aucune annonce populaire trouvée"),
+                        @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
         })
         @GetMapping("/recommandation-not-connected")
         public ResponseEntity<ResponseDTO<List<HashMap<String, List<AnnonceWithUserDTO>>>>> recommandationUserNotConnected(
-            @Parameter(description = "Nombre d'annonces à retourner pour chaque partie") 
-            @RequestParam(defaultValue = "12") Integer nbAnnonces) {
-            return annonceService.recommandationUserNotConnected(nbAnnonces);
+                        @Parameter(description = "Nombre d'annonces à retourner pour chaque partie") @RequestParam(defaultValue = "12") Integer nbAnnonces) {
+                return annonceService.recommandationUserNotConnected(nbAnnonces);
         }
 
 }
