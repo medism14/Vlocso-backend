@@ -80,21 +80,25 @@ public class DataSeederService {
         @Transactional
         private void seedUsersInBatches() {
                 List<User> userBatch = new ArrayList<>();
+                String[] firstNames = {"Thomas", "Nicolas", "Julien", "Pierre", "Marie", "Sophie", "Julie", "Emma", "Lucas", "Hugo"};
+                String[] lastNames = {"Martin", "Bernard", "Dubois", "Petit", "Robert", "Richard", "Durand", "Moreau", "Simon", "Laurent"};
+                
                 for (int i = 0; i < 2000; i++) {
                         User user = new User();
-                        user.setFirstName(faker.name().firstName());
-                        user.setLastName(faker.name().lastName());
-                        user.setEmail(faker.internet().emailAddress());
-                        user.setPassword(passwordService.hashPassword("password123"));
-                        user.setPhoneNumber(faker
-                                        .numerify(random.nextBoolean() ? "+33 6 ## ## ## ##" : "+33 7 ## ## ## ##"));
+                        String firstName = firstNames[random.nextInt(firstNames.length)];
+                        String lastName = lastNames[random.nextInt(lastNames.length)];
+                        user.setFirstName(firstName);
+                        user.setLastName(lastName);
+                        user.setEmail(firstName.toLowerCase() + "." + lastName.toLowerCase() + "@gmail.com");
+                        user.setPassword(passwordService.hashPassword("password@123"));
+                        user.setPhoneNumber(faker.numerify("+33 " + (random.nextBoolean() ? "6" : "7") + "########"));
                         user.setCity(faker.options().option(AnnonceData.CITY_ITEMS));
-                        user.setBirthDate(LocalDate.now().minusYears(faker.number().numberBetween(18, 70)));
+                        user.setBirthDate(LocalDate.now().minusYears(faker.number().numberBetween(25, 55)));
                         user.setEmailVerified(true);
                         user.setRole(UserRole.USER);
                         user.setType(UserType.REGULAR);
                         userBatch.add(user);
-                        
+
                         if (userBatch.size() >= BATCH_SIZE) {
                                 userRepository.saveAll(userBatch);
                                 userBatch.clear();
@@ -127,7 +131,7 @@ public class DataSeederService {
                 String[] categoryItemsMotos = AnnonceData.CATEGORY_ITEMS_MOTOS;
                 String[] cityItems = AnnonceData.CITY_ITEMS;
 
-                for (int i = 0; i < 1000 ; i++) {
+                for (int i = 0; i < 1500; i++) {
                         AnnonceCreationDTO annonceCreationDTO = new AnnonceCreationDTO();
                         AnnonceDetailsCreationDTO annonceDetails = new AnnonceDetailsCreationDTO();
                         VehicleCreationDTO vehicleDetails = new VehicleCreationDTO();
@@ -146,61 +150,108 @@ public class DataSeederService {
                         String carBrand = carBrands.get(random.nextInt(carBrands.size()));
                         String motoBrand = motoBrands.get(random.nextInt(motoBrands.size()));
 
-                        int wordCountTitle = faker.number().numberBetween(2, 11);
-                        String title = String.join(" ", faker.lorem().words(wordCountTitle));
+                        String title;
+                        String model;
+                        String brand;
+                        String category;
+                        List<String> images = new ArrayList<>();
+                        int minKm;
+                        int maxKm;
+                        int minPrice;
+                        int maxPrice;
+                        int minRentalPrice;
+                        int maxRentalPrice;
+
+                        if (typeVehicle.equals("Voiture")) {
+                                List<String> allModels = carModels.get(carBrand);
+                                model = allModels.get(random.nextInt(allModels.size()));
+                                brand = carBrand;
+                                category = categoryCar;
+                                String etat = condition.equals("Neuf") ? "Neuve" : "Occasion";
+                                minKm = 5000;
+                                maxKm = 150000;
+                                minPrice = 5000;
+                                maxPrice = 45000;
+                                minRentalPrice = 50;
+                                maxRentalPrice = 200;
+                                title = String.format("%s %s %s %s - %s %s km",
+                                                brand, model, etat,
+                                                faker.number().numberBetween(2010, 2024),
+                                                faker.number().numberBetween(minKm, maxKm),
+                                                fuelType);
+                                images.add("https://i.pinimg.com/736x/89/e3/9f/89e39f7142f79ffd51212336c212d632.jpg");
+                                images.add("https://i.pinimg.com/736x/f2/c5/b6/f2c5b6adfcef67811cc3daf5cab67e4f.jpg");
+                                images.add("https://i.pinimg.com/736x/0a/e0/f9/0ae0f96c175ab4928a9cab8ad8f8b90b.jpg");
+                        } else {
+                                List<String> allMotoModels = motoModels.get(motoBrand);
+                                model = allMotoModels.get(random.nextInt(allMotoModels.size()));
+                                brand = motoBrand;
+                                category = categoryMoto;
+                                minKm = 1000;
+                                maxKm = 50000;
+                                minPrice = 2000;
+                                maxPrice = 15000;
+                                minRentalPrice = 30;
+                                maxRentalPrice = 100;
+                                title = String.format("%s %s %s - %s km - %s",
+                                                brand, model,
+                                                faker.number().numberBetween(2010, 2024),
+                                                faker.number().numberBetween(minKm, maxKm),
+                                                condition);
+                                images.add("https://i.pinimg.com/736x/3a/00/03/3a0003928caa1ecb8eedd782ea48ad6c.jpg");
+                                images.add("https://i.pinimg.com/736x/d8/e3/7c/d8e37c93acf7970bf26e8be4b1cb6b3c.jpg");
+                                images.add("https://i.pinimg.com/736x/cb/a1/12/cba1121a03dccfdb354fedf7121ef26c.jpg");
+                        }
+
                         annonceDetails.setTitle(title);
                         annonceDetails.setTransaction(transaction);
 
                         if (transaction.equals("Vente")) {
-                                int randomChance = random.nextInt(100);
-                                annonceDetails.setPrice(String.valueOf(faker.number().numberBetween(3000, 90000)));
-                                annonceDetails.setQuantity(
-                                                randomChance >= 90 ? faker.number().numberBetween(1, 30) : 1);
+                                annonceDetails.setPrice(String.valueOf(faker.number().numberBetween(minPrice, maxPrice)));
+                                annonceDetails.setQuantity(1);
                         } else {
-                                annonceDetails.setPrice(String.valueOf(faker.number().numberBetween(30, 1500)));
+                                annonceDetails.setPrice(String.valueOf(faker.number().numberBetween(minRentalPrice, maxRentalPrice)));
                                 annonceDetails.setQuantity(1);
                         }
 
-                        vehicleDetails.setKlm_counter(String.valueOf(faker.number().numberBetween(0, 200000)));
+                        int kmCount = faker.number().numberBetween(minKm, maxKm);
+                        vehicleDetails.setKlm_counter(String.valueOf(kmCount));
                         annonceDetails.setCity(city);
-                        annonceDetails.setPhoneNumber(faker
-                                        .numerify(random.nextBoolean() ? "+33 6 ## ## ## ##" : "+33 7 ## ## ## ##"));
+                        annonceDetails.setPhoneNumber(faker.numerify("+33 " + (random.nextBoolean() ? "6" : "7") + "########"));
                         annonceDetails.setUserId(users.get(random.nextInt(users.size())).getUserId());
                         annonceCreationDTO.setAnnonce(annonceDetails);
 
                         vehicleDetails.setType(typeVehicle);
+                        vehicleDetails.setMark(brand);
+                        vehicleDetails.setModel(model);
+                        vehicleDetails.setCategory(category);
 
-                        if (typeVehicle.equals("Voiture")) {
-                                List<String> allModels = carModels.get(carBrand);
-                                String carModel = allModels.get(random.nextInt(allModels.size()));
-                                vehicleDetails.setMark(carBrand);
-                                vehicleDetails.setModel(carModel);
-                                vehicleDetails.setCategory(categoryCar);
-                        } else {
-                                List<String> allMotoModels = motoModels.get(motoBrand);
-                                String motoModel = allMotoModels.get(random.nextInt(allMotoModels.size()));
-                                vehicleDetails.setMark(motoBrand);
-                                vehicleDetails.setModel(motoModel);
-                                vehicleDetails.setCategory(categoryMoto);
-                        }
-
-                        vehicleDetails.setYear(faker.number().numberBetween(1970, 2024));
+                        vehicleDetails.setYear(faker.number().numberBetween(2010, 2024));
                         vehicleDetails.setGearbox(gearbox);
                         vehicleDetails.setClimatisation(climatisation);
                         vehicleDetails.setCondition(condition);
                         vehicleDetails.setFuelType(fuelType);
                         vehicleDetails.setColor(color);
-                        vehicleDetails.setDescription(
-                                        String.join(" ", faker.lorem().words(faker.number().numberBetween(10, 40))));
-                        annonceCreationDTO.setVehicle(vehicleDetails);
 
-                        List<String> images = new ArrayList<>();
-                        images.add("https://next-images.123rf.com/index/_next/image/?url=https://assets-cdn.123rf.com/index/static/assets/top-section-bg.jpeg&w=3840&q=75");
-                        images.add("https://images.pexels.com/photos/1302434/pexels-photo-1302434.jpeg?cs=srgb&dl=pexels-alexfu-1302434.jpg&fm=jpg");
+                        String description;
+                        if (condition.equals("Neuf")) {
+                            description = String.format("Superbe %s %s %s neuf%s. %s, %s. Disponible immédiatement pour %s.",
+                                brand, model, typeVehicle.toLowerCase(), typeVehicle.equals("Voiture") ? "ve" : "",
+                                gearbox, climatisation, transaction.toLowerCase());
+                        } else {
+                            description = String.format("%s %s %s de %d avec %d km. %s, %s, %s. Véhicule bien entretenu, disponible pour %s.",
+                                brand, model, typeVehicle.toLowerCase(),
+                                vehicleDetails.getYear(), kmCount,
+                                gearbox, climatisation, fuelType,
+                                transaction.toLowerCase());
+                        }
+                        
+                        vehicleDetails.setDescription(description);
+                        annonceCreationDTO.setVehicle(vehicleDetails);
                         annonceCreationDTO.setImages(images);
 
                         batch.add(annonceCreationDTO);
-                        
+
                         if (batch.size() >= BATCH_SIZE) {
                                 saveAnnonceBatch(batch);
                                 batch.clear();
@@ -235,9 +286,10 @@ public class DataSeederService {
                 }
 
                 for (User user : users) {
-                        if (random.nextInt(100) < 5) continue;
-                        
-                        int numberOfInteractions = random.nextInt(50) + 1;
+                        if (random.nextInt(100) < 5)
+                                continue;
+
+                        int numberOfInteractions = random.nextInt(20) + 1;
                         for (int j = 0; j < numberOfInteractions; j++) {
                                 Interaction interaction = new Interaction();
                                 Annonce annonce = annonces.get(random.nextInt(annonces.size()));
@@ -248,12 +300,28 @@ public class DataSeederService {
                                 interaction.setInteractionType(actualInteractionType);
 
                                 if (actualInteractionType.equals("Search")) {
-                                        interaction.setContent(String.join(" ",
-                                                        faker.lorem().words(faker.number().numberBetween(1, 7))));
+                                        String[] searchTerms = {
+                                            "voiture occasion", "voiture pas cher", "voiture propre",
+                                            "moto sportive", "moto custom", "moto trail", "moto routière",
+                                            "4x4 diesel", "4x4 essence", "4x4 hybride", "4x4 électrique",
+                                            "citadine essence", "citadine électrique", "citadine hybride",
+                                            "utilitaire", "utilitaire grand volume", "utilitaire frigorifique",
+                                            "berline automatique", "berline luxe", "berline familiale",
+                                            "break familial", "break occasion", "break diesel",
+                                            "cabriolet", "coupé sport", "SUV familial",
+                                            "voiture collection", "voiture ancienne", "voiture neuve",
+                                            "scooter 125", "scooter électrique", "quad",
+                                            "camping car", "van aménagé", "fourgon aménagé",
+                                            "voiture boite auto", "voiture faible kilométrage",
+                                            "voiture première main", "voiture garantie",
+                                            "moto permis A2", "moto petit budget",
+                                            "véhicule commercial", "véhicule société"
+                                        };
+                                        interaction.setContent(searchTerms[random.nextInt(searchTerms.length)]);
                                 }
 
                                 interactionBatch.add(interaction);
-                                
+
                                 if (interactionBatch.size() >= BATCH_SIZE) {
                                         interactionRepository.saveAll(interactionBatch);
                                         interactionBatch.clear();
@@ -264,5 +332,4 @@ public class DataSeederService {
                         interactionRepository.saveAll(interactionBatch);
                 }
         }
-
 }
