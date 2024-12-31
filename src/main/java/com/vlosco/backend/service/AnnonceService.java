@@ -1174,5 +1174,27 @@ public class AnnonceService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDTO<List<String>>> getAllCities() {
+        ResponseDTO<List<String>> response = new ResponseDTO<>();
+        try {
+            List<String> cities = annonceRepository.findAllCities();
+            
+            if (cities.isEmpty()) {
+                response.setMessage("Aucune ville trouvée");
+                return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+            }
+
+            // Trier les villes par ordre alphabétique
+            Collections.sort(cities);
+            
+            response.setData(cities);
+            response.setMessage("Liste des villes récupérée avec succès");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setMessage("Erreur lors de la récupération des villes : " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }

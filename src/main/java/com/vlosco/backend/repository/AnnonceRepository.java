@@ -492,4 +492,7 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
         );
+
+        @Query("SELECT DISTINCT a.city FROM Annonce a WHERE a.city IS NOT NULL ORDER BY a.city")
+        List<String> findAllCities();
 }
