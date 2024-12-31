@@ -117,7 +117,7 @@ public class VehicleService {
             vehicle.setGearbox(vehicleDto.getGearbox());
             vehicle.setClimatisation(vehicleDto.getClimatisation());
             vehicle.setFuelType(vehicleDto.getFuelType());
-            vehicle.setKlmCounter(vehicleDto.getKlm_counter());
+            vehicle.setKlmCounter(vehicleDto.getKlmCounter());
             vehicle.setDescription(vehicleDto.getDescription());
             vehicle.setType(vehicleDto.getType());
             vehicle.setCondition(vehicleDto.getCondition());
@@ -168,8 +168,8 @@ public class VehicleService {
                     vehicle.setFuelType(updatedVehicle.getFuelType());
                 if (updatedVehicle.getGearbox() != null)
                     vehicle.setGearbox(updatedVehicle.getGearbox());
-                if (updatedVehicle.getKlm_counter() != null)
-                    vehicle.setKlmCounter(updatedVehicle.getKlm_counter());
+                if (updatedVehicle.getKlmCounter() != null)
+                    vehicle.setKlmCounter(updatedVehicle.getKlmCounter());
                 if (updatedVehicle.getClimatisation() != null)
                     vehicle.setClimatisation(updatedVehicle.getClimatisation());
                 if (updatedVehicle.getDescription() != null)

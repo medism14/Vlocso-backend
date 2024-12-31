@@ -45,7 +45,7 @@ public class VehicleCreationDTO {
     private String fuelType;
 
     @Schema(description = "Compteur kilométrique", example = "15000")
-    private String klm_counter;
+    private Integer klmCounter;
 
     @Schema(description = "Description du véhicule", example = "Véhicule en excellent état")
     private String description;
@@ -114,12 +114,12 @@ public class VehicleCreationDTO {
         this.fuelType = fuelType;
     }
 
-    public String getKlm_counter() {
-        return klm_counter;
+    public Integer getKlmCounter() {
+        return klmCounter;
     }
 
-    public void setKlm_counter(String klm_counter) {
-        this.klm_counter = klm_counter;
+    public void setKlmCounter(Integer klmCounter) {
+        this.klmCounter = klmCounter;
     }
 
     public String getDescription() {

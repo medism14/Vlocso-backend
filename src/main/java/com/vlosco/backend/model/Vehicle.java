@@ -40,7 +40,7 @@ public class Vehicle {
     private String gearbox;
 
     @Column(name = "klm_counter", nullable = false)
-    private String klmCounter;
+    private Integer klmCounter;
 
     @Column(name = "condition", nullable = false)
     private String condition;
@@ -135,11 +135,11 @@ public class Vehicle {
         this.gearbox = gearbox;
     }
 
-    public String getKlmCounter() {
+    public Integer getKlmCounter() {
         return klmCounter;
     }
 
-    public void setKlmCounter(String klmCounter) {
+    public void setKlmCounter(Integer klmCounter) {
         this.klmCounter = klmCounter;
     }
 

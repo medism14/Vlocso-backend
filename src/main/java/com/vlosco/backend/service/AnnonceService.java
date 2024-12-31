@@ -919,8 +919,8 @@ public class AnnonceService {
             score += 4.0;
 
         // Proximité de kilométrage (score dégressif)
-        int kmDiff = Math.abs(Integer.parseInt(refVehicle.getKlmCounter()) -
-                Integer.parseInt(otherVehicle.getKlmCounter()));
+        int kmDiff = Math.abs(refVehicle.getKlmCounter() -
+                otherVehicle.getKlmCounter());
         if (kmDiff < 10000)
             score += 5.0;
         else if (kmDiff < 30000)
@@ -929,9 +929,9 @@ public class AnnonceService {
             score += 1.0;
 
         // Proximité de prix
-        double priceDiff = Math.abs(Double.parseDouble(reference.getPrice()) -
-                Double.parseDouble(other.getPrice()));
-        double refPrice = Double.parseDouble(reference.getPrice());
+        double priceDiff = Math.abs(reference.getPrice() -
+                other.getPrice());
+        double refPrice = reference.getPrice();
         if (priceDiff < refPrice * 0.1)
             score += 5.0;
         else if (priceDiff < refPrice * 0.2)

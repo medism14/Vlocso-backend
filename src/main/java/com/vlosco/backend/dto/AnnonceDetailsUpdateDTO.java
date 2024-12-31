@@ -11,7 +11,7 @@ public class AnnonceDetailsUpdateDTO {
     private String title;
 
     @Schema(description = "Prix de l'annonce", example = "15000", required = true)
-    private String price;
+    private Double price;
 
     @Schema(description = "Type de transaction (vente ou achat)", example = "vente", required = true)
     private String transaction;
@@ -36,11 +36,11 @@ public class AnnonceDetailsUpdateDTO {
         this.title = title;
     }
 
-    public String getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 

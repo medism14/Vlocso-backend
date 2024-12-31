@@ -168,7 +168,7 @@ public class DataSeederService {
 
                 List<String> firstNames = new ArrayList<>(firstNamesMap.keySet());
 
-                for (int i = 0; i < 2500; i++) {
+                for (int i = 0; i < 1500; i++) {
                         User user = new User();
                         String firstName = firstNames.get(random.nextInt(firstNames.size()));
                         String lastName = namesMap.get(random.nextInt(namesMap.size()));
@@ -349,7 +349,7 @@ public class DataSeederService {
                         }
                 };
 
-                for (int i = 0; i < 1500; i++) {
+                for (int i = 0; i < 2000; i++) {
                         AnnonceCreationDTO annonceCreationDTO = new AnnonceCreationDTO();
                         AnnonceDetailsCreationDTO annonceDetails = new AnnonceDetailsCreationDTO();
                         VehicleCreationDTO vehicleDetails = new VehicleCreationDTO();
@@ -422,16 +422,16 @@ public class DataSeederService {
 
                         if (transaction.equals("Vente")) {
                                 annonceDetails.setPrice(
-                                                String.valueOf(faker.number().numberBetween(minPrice, maxPrice)));
+                                                Double.valueOf(faker.number().numberBetween(minPrice, maxPrice)));
                                 annonceDetails.setQuantity(1);
                         } else {
-                                annonceDetails.setPrice(String
-                                                .valueOf(faker.number().numberBetween(minRentalPrice, maxRentalPrice)));
+                                annonceDetails.setPrice(
+                                                Double.valueOf(faker.number().numberBetween(minRentalPrice, maxRentalPrice)));
                                 annonceDetails.setQuantity(1);
                         }
 
                         int kmCount = faker.number().numberBetween(minKm, maxKm);
-                        vehicleDetails.setKlm_counter(String.valueOf(kmCount));
+                        vehicleDetails.setKlmCounter(kmCount);
                         annonceDetails.setCity(city);
                         annonceDetails.setPhoneNumber(
                                         faker.numerify("+33 " + (random.nextBoolean() ? "6" : "7") + "## ## ## ##"));

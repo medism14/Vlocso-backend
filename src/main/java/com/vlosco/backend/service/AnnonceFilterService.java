@@ -63,7 +63,7 @@ public class AnnonceFilterService {
     }
 
     private boolean filterByPrice(Annonce annonce, AnnonceFilterDTO filterDTO) {
-        double price = Double.parseDouble(annonce.getPrice());
+        double price = annonce.getPrice();
         if (filterDTO.getMinPrice() != null && price < filterDTO.getMinPrice()) {
             return false;
         }
@@ -81,7 +81,7 @@ public class AnnonceFilterService {
     }
 
     private boolean filterByKilometrage(Annonce annonce, AnnonceFilterDTO filterDTO) {
-        int km = Integer.parseInt(annonce.getVehicle().getKlmCounter());
+        int km = annonce.getVehicle().getKlmCounter();
         if (filterDTO.getKilometrageMin() != null && km < filterDTO.getKilometrageMin()) {
             return false;
         }
@@ -100,10 +100,10 @@ public class AnnonceFilterService {
                 annonces.sort(Comparator.comparing(Annonce::getCreatedAt).reversed());
                 break;
             case "price_asc":
-                annonces.sort(Comparator.comparingDouble((Annonce a) -> Double.parseDouble(a.getPrice())));
+                annonces.sort(Comparator.comparingDouble((Annonce a) -> a.getPrice()));
                 break;
             case "price_desc":
-                annonces.sort(Comparator.comparingDouble((Annonce a) -> Double.parseDouble(a.getPrice())).reversed());
+                annonces.sort(Comparator.comparingDouble((Annonce a) -> a.getPrice()).reversed());
                 break;
             default:
                 throw new IllegalArgumentException("Critère de tri non valide: " + sortBy);

@@ -87,7 +87,7 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
                                 OR v.category = :category
                                 OR v.fuelType = :fuelType
                                 OR ABS(v.year - :year) <= 5
-                                OR ABS(CAST(a.price AS double) - :price) <= :price * 0.3
+                                OR ABS(a.price - :price) <= :price * 0.3
                                 OR a.city = :city
                             )
                             ORDER BY
@@ -105,7 +105,7 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
                         @Param("category") String category,
                         @Param("fuelType") String fuelType,
                         @Param("year") Integer year,
-                        @Param("price") String price,
+                        @Param("price") Double price,
                         @Param("annonceId") Long annonceId,
                         @Param("city") String city);
 
@@ -124,10 +124,10 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
                         AND (:city IS NULL OR a.city = :city)
                         AND (:year IS NULL OR v.year = :year)
                         AND (:transaction IS NULL OR a.transaction = :transaction)
-                        AND (:minKilometrage IS NULL OR CAST(v.klmCounter AS integer) >= :minKilometrage)
-                        AND (:maxKilometrage IS NULL OR CAST(v.klmCounter AS integer) <= :maxKilometrage)
-                        AND (:minPrice IS NULL OR CAST(a.price AS double) >= :minPrice)
-                        AND (:maxPrice IS NULL OR CAST(a.price AS double) <= :maxPrice)
+                        AND (:minKilometrage IS NULL OR v.klmCounter >= :minKilometrage)
+                        AND (:maxKilometrage IS NULL OR v.klmCounter <= :maxKilometrage)
+                        AND (:minPrice IS NULL OR a.price >= :minPrice)
+                        AND (:maxPrice IS NULL OR a.price <= :maxPrice)
                         AND a.annonceState = 'ACTIVE'
                         AND (COALESCE(:excludedIds, NULL) IS NULL OR a.annonceId NOT IN (:excludedIds))
                         ORDER BY a.createdAt ASC
@@ -162,10 +162,10 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
                         AND (:city IS NULL OR a.city = :city)
                         AND (:year IS NULL OR v.year = :year)
                         AND (:transaction IS NULL OR a.transaction = :transaction)
-                        AND (:minKilometrage IS NULL OR CAST(v.klmCounter AS integer) >= :minKilometrage)
-                        AND (:maxKilometrage IS NULL OR CAST(v.klmCounter AS integer) <= :maxKilometrage)
-                        AND (:minPrice IS NULL OR CAST(a.price AS double) >= :minPrice)
-                        AND (:maxPrice IS NULL OR CAST(a.price AS double) <= :maxPrice)
+                        AND (:minKilometrage IS NULL OR v.klmCounter >= :minKilometrage)
+                        AND (:maxKilometrage IS NULL OR v.klmCounter <= :maxKilometrage)
+                        AND (:minPrice IS NULL OR a.price >= :minPrice)
+                        AND (:maxPrice IS NULL OR a.price <= :maxPrice)
                         AND a.annonceState = 'ACTIVE'
                         AND (COALESCE(:excludedIds, NULL) IS NULL OR a.annonceId NOT IN (:excludedIds))
                         ORDER BY a.createdAt ASC
@@ -200,10 +200,10 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
                         AND (:city IS NULL OR a.city = :city)
                         AND (:year IS NULL OR v.year = :year)
                         AND (:transaction IS NULL OR a.transaction = :transaction)
-                        AND (:minKilometrage IS NULL OR CAST(v.klmCounter AS integer) >= :minKilometrage)
-                        AND (:maxKilometrage IS NULL OR CAST(v.klmCounter AS integer) <= :maxKilometrage)
-                        AND (:minPrice IS NULL OR CAST(a.price AS double) >= :minPrice)
-                        AND (:maxPrice IS NULL OR CAST(a.price AS double) <= :maxPrice)
+                        AND (:minKilometrage IS NULL OR v.klmCounter >= :minKilometrage)
+                        AND (:maxKilometrage IS NULL OR v.klmCounter <= :maxKilometrage)
+                        AND (:minPrice IS NULL OR a.price >= :minPrice)
+                        AND (:maxPrice IS NULL OR a.price <= :maxPrice)
                         AND a.annonceState = 'ACTIVE'
                         AND (COALESCE(:excludedIds, NULL) IS NULL OR a.annonceId NOT IN (:excludedIds))
                         ORDER BY a.createdAt DESC
@@ -238,10 +238,10 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
                         AND (:city IS NULL OR a.city = :city)
                         AND (:year IS NULL OR v.year = :year)
                         AND (:transaction IS NULL OR a.transaction = :transaction)
-                        AND (:minKilometrage IS NULL OR CAST(v.klmCounter AS integer) >= :minKilometrage)
-                        AND (:maxKilometrage IS NULL OR CAST(v.klmCounter AS integer) <= :maxKilometrage)
-                        AND (:minPrice IS NULL OR CAST(a.price AS double) >= :minPrice)
-                        AND (:maxPrice IS NULL OR CAST(a.price AS double) <= :maxPrice)
+                        AND (:minKilometrage IS NULL OR v.klmCounter >= :minKilometrage)
+                        AND (:maxKilometrage IS NULL OR v.klmCounter <= :maxKilometrage)
+                        AND (:minPrice IS NULL OR a.price >= :minPrice)
+                        AND (:maxPrice IS NULL OR a.price <= :maxPrice)
                         AND a.annonceState = 'ACTIVE'
                         AND (COALESCE(:excludedIds, NULL) IS NULL OR a.annonceId NOT IN (:excludedIds))
                         ORDER BY a.price ASC
@@ -276,10 +276,10 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
                         AND (:city IS NULL OR a.city = :city)
                         AND (:year IS NULL OR v.year = :year)
                         AND (:transaction IS NULL OR a.transaction = :transaction)
-                        AND (:minKilometrage IS NULL OR CAST(v.klmCounter AS integer) >= :minKilometrage)
-                        AND (:maxKilometrage IS NULL OR CAST(v.klmCounter AS integer) <= :maxKilometrage)
-                        AND (:minPrice IS NULL OR CAST(a.price AS double) >= :minPrice)
-                        AND (:maxPrice IS NULL OR CAST(a.price AS double) <= :maxPrice)
+                        AND (:minKilometrage IS NULL OR v.klmCounter >= :minKilometrage)
+                        AND (:maxKilometrage IS NULL OR v.klmCounter <= :maxKilometrage)
+                        AND (:minPrice IS NULL OR a.price >= :minPrice)
+                        AND (:maxPrice IS NULL OR a.price <= :maxPrice)
                         AND a.annonceState = 'ACTIVE'
                         AND (COALESCE(:excludedIds, NULL) IS NULL OR a.annonceId NOT IN (:excludedIds))
                         ORDER BY a.price DESC
@@ -417,16 +417,17 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
 
         @Query("""
         SELECT a FROM Annonce a 
+        JOIN a.vehicle v
         WHERE (:premium IS NULL OR a.premium = :premium)
         AND (:transaction IS NULL OR a.transaction = :transaction)
         AND (:city IS NULL OR a.city = :city)
-        AND (:minKilometrage IS NULL OR CAST(a.vehicle.klmCounter AS integer) >= :minKilometrage)
-        AND (:maxKilometrage IS NULL OR CAST(a.vehicle.klmCounter AS integer) <= :maxKilometrage)
-        AND (:minPrice IS NULL OR CAST(a.price AS double) >= :minPrice)
-        AND (:maxPrice IS NULL OR CAST(a.price AS double) <= :maxPrice)
-        AND (:mark IS NULL OR a.vehicle.mark = :mark)
-        AND (:model IS NULL OR a.vehicle.model = :model)
-        AND (:type IS NULL OR a.vehicle.type = :type)
+        AND (:minKilometrage IS NULL OR v.klmCounter >= :minKilometrage)
+        AND (:maxKilometrage IS NULL OR v.klmCounter <= :maxKilometrage)
+        AND (:minPrice IS NULL OR a.price >= :minPrice)
+        AND (:maxPrice IS NULL OR a.price <= :maxPrice)
+        AND (:mark IS NULL OR v.mark = :mark)
+        AND (:model IS NULL OR v.model = :model)
+        AND (:type IS NULL OR v.type = :type)
         AND a.annonceId IN :annonceIds
         """)
         List<Annonce> filterAnnonces(

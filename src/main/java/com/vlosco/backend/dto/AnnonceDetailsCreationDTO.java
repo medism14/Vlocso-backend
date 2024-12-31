@@ -20,7 +20,7 @@ public class AnnonceDetailsCreationDTO {
 
     @NotNull
     @Schema(description = "Prix de l'annonce", example = "15000", required = true)
-    private String price;
+    private Double price;
 
     @NotNull
     @Schema(description = "Type de transaction (vente ou achat)", example = "vente", required = true)
@@ -53,11 +53,11 @@ public class AnnonceDetailsCreationDTO {
         this.title = title;
     }
 
-    public String getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 

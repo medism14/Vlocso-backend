@@ -33,7 +33,7 @@ public class Annonce {
     private String title;
 
     @Column(name = "price", nullable = false)
-    private String price;
+    private Double price;
 
     @Column(name = "start_date", nullable = false)
     private LocalDateTime startDate;
@@ -127,11 +127,11 @@ public class Annonce {
         this.title = title;
     }
 
-    public String getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 

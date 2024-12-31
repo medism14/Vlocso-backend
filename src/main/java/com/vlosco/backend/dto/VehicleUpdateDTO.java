@@ -36,7 +36,7 @@ public class VehicleUpdateDTO {
     private String color;
 
     @Schema(description = "Compteur kilométrique", example = "15000")
-    private String klm_counter;
+    private Integer klmCounter;
 
     @Schema(description = "Description du véhicule", example = "Véhicule en excellent état")
     private String description;
@@ -105,12 +105,12 @@ public class VehicleUpdateDTO {
         this.condition = condition;
     }
 
-    public String getKlm_counter() {
-        return klm_counter;
+    public Integer getKlmCounter() {
+        return klmCounter;
     }
 
-    public void setKlm_counter(String klm_counter) {
-        this.klm_counter = klm_counter;
+    public void setKlmCounter(Integer klm_counter) {
+        this.klmCounter = klm_counter;
     }
 
     public String getDescription() {
