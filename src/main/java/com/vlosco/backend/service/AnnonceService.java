@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,6 +39,9 @@ import com.vlosco.backend.repository.AnnonceRepository;
 import com.vlosco.backend.repository.InteractionRepository;
 import com.vlosco.backend.repository.UserRepository;
 import com.vlosco.backend.utils.SearchUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Service gérant les annonces de véhicules.
@@ -49,6 +53,8 @@ import com.vlosco.backend.utils.SearchUtils;
 @Service
 public class AnnonceService {
 
+    private static final Logger log = LoggerFactory.getLogger(AnnonceService.class);
+
     private final AnnonceRepository annonceRepository;
     private final RestTemplate restTemplate;
 
@@ -59,6 +65,9 @@ public class AnnonceService {
 
     @Value("${fastapi.url}")
     private String fastapiUrl;
+
+    @Autowired
+    private NotificationService notificationService;
 
     public AnnonceService(AnnonceRepository annonceRepository, VehicleService vehicleService,
             UserRepository userRepository, ImageService imageService, RestTemplate restTemplate,
@@ -81,6 +90,7 @@ public class AnnonceService {
      *         - 204 NO_CONTENT: Si aucune annonce n'existe
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<AnnonceWithUserDTO>>> getAllAnnonces() {
         ResponseDTO<List<AnnonceWithUserDTO>> response = new ResponseDTO<>();
         try {
@@ -114,6 +124,7 @@ public class AnnonceService {
      *         - 404 NOT_FOUND: Si aucune annonce ne correspond à l'ID
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<AnnonceWithUserDTO>> getAnnonceById(Long id) {
         ResponseDTO<AnnonceWithUserDTO> response = new ResponseDTO<>();
         try {
@@ -263,6 +274,7 @@ public class AnnonceService {
      *         - 204 NO_CONTENT: Si l'utilisateur n'a pas d'annonces
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<AnnonceWithUserDTO>>> getAnnoncesByUserId(Long userId) {
         ResponseDTO<List<AnnonceWithUserDTO>> response = new ResponseDTO<>();
         try {
@@ -296,6 +308,7 @@ public class AnnonceService {
      *         - 400 BAD_REQUEST: Si le véhicule spécifié n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<AnnonceWithUserDTO>> createAnnonce(AnnonceCreationDTO annonceCreationDTO) {
         ResponseDTO<AnnonceWithUserDTO> response = new ResponseDTO<>();
         try {
@@ -367,6 +380,7 @@ public class AnnonceService {
      *         - 404 NOT_FOUND: Si l'annonce à modifier n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<AnnonceWithUserDTO>> updateAnnonce(Long id, AnnonceUpdateDTO annonceUpdateDTO) {
         ResponseDTO<AnnonceWithUserDTO> response = new ResponseDTO<>();
         try {
@@ -451,6 +465,7 @@ public class AnnonceService {
      *         - 404 NOT_FOUND: Si l'annonce à supprimer n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Void>> deleteAnnonce(Long id) {
         ResponseDTO<Void> response = new ResponseDTO<>();
         try {
@@ -479,6 +494,7 @@ public class AnnonceService {
      *         - 204 NO_CONTENT: Si aucune annonce ne correspond au mot-clé
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<AnnonceWithUserDTO>>> searchAnnonces(String searchText, String[] excludedIds,
             Integer nbAnnonces, String sort, String filterTransaction, Integer minKilometrage, Integer maxKilometrage,
             Double minPrice, Double maxPrice, String city, String filterMark, String filterModel) {
@@ -644,6 +660,7 @@ public class AnnonceService {
      *         - 204 NO_CONTENT: Si aucune annonce n'existe pour cette transaction
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<Annonce>>> getAnnoncesByTransaction(String transaction) {
         ResponseDTO<List<Annonce>> response = new ResponseDTO<>();
         try {
@@ -673,6 +690,7 @@ public class AnnonceService {
      *         - 204 NO_CONTENT: Si aucune annonce n'existe pour cette localisation
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<Annonce>>> getAnnoncesByLocation(String country, String city) {
         ResponseDTO<List<Annonce>> response = new ResponseDTO<>();
         try {
@@ -705,6 +723,7 @@ public class AnnonceService {
      *         premium
      *         ou un message d'erreur si l'annonce n'est pas trouvée.
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<PremiumAnnonceDTO>> getPremiumAnnonce(Long id) {
         ResponseDTO<PremiumAnnonceDTO> response = new ResponseDTO<>();
         Optional<Annonce> premiumAnnonce = annonceRepository.findPremiumAnnonceById(id);
@@ -745,32 +764,65 @@ public class AnnonceService {
      *         annonces filtrées
      *         ou un message d'erreur si aucune annonce ne correspond aux critères.
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<Annonce>>> filterAnnonces(
-            Long vendorId, String annonceState, String title, Boolean premium,
-            String vehicles, String sort, String transaction, String annonce,
-            Integer minKilometrage, Integer maxKilometrage,
-            Double minPrice, Double maxPrice, String city, String marque) {
+            List<Long> annonceIds,
+            Long vendorId,
+            String annonceState,
+            Boolean premium,
+            String typeVehicle,
+            String sort,
+            String transaction,
+            String annonce,
+            Integer minKilometrage,
+            Integer maxKilometrage,
+            Double minPrice,
+            Double maxPrice,
+            String city,
+            String marque,
+            String model) {
 
         ResponseDTO<List<Annonce>> response = new ResponseDTO<>();
         try {
-            Optional<List<Annonce>> filteredAnnonces = annonceRepository.filterAnnonces(
-                    vendorId,
-                    premium,
-                    transaction,
-                    annonceState,
-                    city,
-                    minKilometrage,
-                    maxKilometrage,
-                    minPrice,
-                    maxPrice,
-                    marque);
+            List<Annonce> filteredAnnonces = annonceRepository.filterAnnonces(
+                annonceIds,
+                premium,
+                transaction,
+                city,
+                minKilometrage,
+                maxKilometrage,
+                minPrice,
+                maxPrice,
+                marque,
+                model,
+                typeVehicle
+            );
 
-            if (filteredAnnonces.isPresent() && filteredAnnonces.get().isEmpty()) {
+            if (filteredAnnonces.isEmpty()) {
                 response.setMessage("Aucune annonce trouvée avec les critères spécifiés");
                 return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
             }
+
+            // Appliquer le tri si spécifié
+            if (sort != null) {
+                switch (sort.toLowerCase()) {
+                    case "price_asc":
+                        filteredAnnonces.sort((a1, a2) -> a1.getPrice().compareTo(a2.getPrice()));
+                        break;
+                    case "price_desc":
+                        filteredAnnonces.sort((a1, a2) -> a2.getPrice().compareTo(a1.getPrice()));
+                        break;
+                    case "date_asc":
+                        filteredAnnonces.sort((a1, a2) -> a1.getCreatedAt().compareTo(a2.getCreatedAt()));
+                        break;
+                    case "date_desc":
+                        filteredAnnonces.sort((a1, a2) -> a2.getCreatedAt().compareTo(a1.getCreatedAt()));
+                        break;
+                }
+            }
+
             response.setMessage("Annonces filtrées avec succès");
-            response.setData(filteredAnnonces.orElse(Collections.emptyList()));
+            response.setData(filteredAnnonces);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1011,5 +1063,116 @@ public class AnnonceService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+    /**
+     * Vérifie les annonces pour:
+     * - Marquer comme expirées celles qui ont dépassé leur date de fin
+     * - Notifier les vendeurs une semaine avant l'expiration
+     * Utilise CRON: "0 0 * * * *" signifie:
+     * - 0 secondes
+     * - 0 minutes
+     * - toutes les heures
+     * - tous les jours
+     * - tous les mois
+     * - tous les jours de la semaine
+     */
+    @Scheduled(cron = "0 0 * * * *")
+    @Transactional
+    public void checkAndNotifyAnnonces() {
+        log.info("Vérification des annonces...");
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime oneWeekFromNow = now.plusWeeks(1);
+
+        try {
+            // Récupère les annonces expirées
+            List<Annonce> expiredAnnonces = annonceRepository.findByAnnonceStateAndEndDateBefore(
+                AnnonceState.ACTIVE, 
+                now
+            );
+
+            // Traite les annonces expirées
+            if (!expiredAnnonces.isEmpty()) {
+                for (Annonce annonce : expiredAnnonces) {
+                    annonce.setAnnonceState(AnnonceState.EXPIRED);
+                    annonceRepository.save(annonce);
+
+                    // Utilisation du NotificationService
+                    notificationService.createNotification(
+                        annonce.getVendor().getUserId(),
+                        annonce.getAnnonceId(),
+                        "Annonce expirée",
+                        "Votre annonce \"" + annonce.getTitle() + "\" a expiré.",
+                        false,
+                        null
+                    );
+                }
+                log.info("{} annonces expirées ont été mises à jour", expiredAnnonces.size());
+            }
+
+            // Récupère les annonces qui expirent dans une semaine
+            List<Annonce> expiringAnnonces = annonceRepository.findByAnnonceStateAndEndDateBetween(
+                AnnonceState.ACTIVE,
+                now,
+                oneWeekFromNow
+            );
+
+            // Notifie pour les annonces qui vont expirer
+            if (!expiringAnnonces.isEmpty()) {
+                for (Annonce annonce : expiringAnnonces) {
+                    notificationService.createNotification(
+                        annonce.getVendor().getUserId(),
+                        annonce.getAnnonceId(),
+                        "Annonce bientôt expirée",
+                        "Votre annonce \"" + annonce.getTitle() + "\" expirera dans une semaine.",
+                        false,
+                        annonce.getEndDate()
+                    );
+                }
+                log.info("{} notifications d'expiration prochaine envoyées", expiringAnnonces.size());
+            }
+
+        } catch (Exception e) {
+            log.error("Erreur lors de la vérification des annonces: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Vérifie quotidiennement à minuit les annonces premium dont le paiement a expiré
+     * et les notifications à envoyer pour les paiements qui vont bientôt expirer
+     */
+    @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
+    public void checkPremiumPaymentsStatus() {
+        log.info("Vérification des paiements premium des annonces...");
+        LocalDateTime now = LocalDateTime.now();
+
+        try {
+            // Récupérer les annonces premium dont le paiement est expiré
+            List<Annonce> expiredPremiumAnnonces = annonceRepository.findPremiumAnnoncesWithExpiredPayment(now);
+
+            if (!expiredPremiumAnnonces.isEmpty()) {
+                for (Annonce annonce : expiredPremiumAnnonces) {
+                    // Désactiver le statut premium
+                    annonce.setPremium(false);
+                    annonceRepository.save(annonce);
+
+                    // Notifier le vendeur
+                    notificationService.createNotification(
+                        annonce.getVendor().getUserId(),
+                        annonce.getAnnonceId(),
+                        "Statut premium expiré",
+                        "Le statut premium de votre annonce \"" + annonce.getTitle() + "\" a expiré. " +
+                        "Vous pouvez effectuer un nouveau paiement pour maintenir une meilleure visibilité.",
+                        false,
+                        null
+                    );
+                }
+                log.info("{} annonces premium ont été désactivées", expiredPremiumAnnonces.size());
+            }
+        } catch (Exception e) {
+            log.error("Erreur lors de la vérification des paiements premium: {}", e.getMessage());
+        }
+    }
+
 
 }

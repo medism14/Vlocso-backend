@@ -11,6 +11,8 @@
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/ImageController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/InteractionController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/MessageController.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/NotificationController.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/PaymentPremiumController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/ProviderController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/UserController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/VehicleController.java
@@ -36,6 +38,9 @@
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/MessageCreationDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/MessageResponseDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/MessageUpdateDTO.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/NotificationCreationDTO.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/NotificationUpdateDTO.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/PaymentPremiumDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/PremiumAnnonceDTO.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/RecommandationUserNeedData.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/dto/RefreshTokenDTO.java
@@ -59,6 +64,7 @@
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/enums/ColorVehicle.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/enums/ConditionVehicle.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/enums/FuelTypeVehicle.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/enums/PaymentStatus.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/enums/ProviderNames.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/enums/SortSearch.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/enums/TransactionType.java

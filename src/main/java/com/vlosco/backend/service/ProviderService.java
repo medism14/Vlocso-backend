@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vlosco.backend.dto.CreateProviderDTO;
 import com.vlosco.backend.dto.ResponseDTO;
@@ -35,6 +36,7 @@ public class ProviderService {
      *         - 200 OK: Liste des providers avec message de succès
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique lors de la récupération
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<Provider>>> getAllProviders() {
         ResponseDTO<List<Provider>> response = new ResponseDTO<>();
         try {
@@ -59,6 +61,7 @@ public class ProviderService {
      *         - 404 NOT_FOUND: Si aucun provider ne correspond à l'ID fourni
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique lors de la recherche
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<Provider>> getProviderById(Long id) {
         ResponseDTO<Provider> response = new ResponseDTO<>();
         try {
@@ -90,6 +93,7 @@ public class ProviderService {
      *         - 400 BAD_REQUEST: Si les données fournies sont invalides ou manquantes
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique lors de la création
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Provider>> createProvider(CreateProviderDTO providerCreate) {
         ResponseDTO<Provider> response = new ResponseDTO<>();
         // Validation des données d'entrée
@@ -126,6 +130,7 @@ public class ProviderService {
      *         - 404 NOT_FOUND: Si le provider à mettre à jour n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique lors de la mise à jour
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Provider>> updateProvider(Long id, UpdateProviderDTO providerUpdate) {
         ResponseDTO<Provider> response = new ResponseDTO<>();
         // Validation des données d'entrée
@@ -165,6 +170,7 @@ public class ProviderService {
      *         - 404 NOT_FOUND: Si le provider à supprimer n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique lors de la suppression
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Void>> deleteProvider(Long id) {
         ResponseDTO<Void> response = new ResponseDTO<>();
         try {

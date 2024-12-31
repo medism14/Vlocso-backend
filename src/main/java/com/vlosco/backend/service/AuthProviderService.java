@@ -3,6 +3,7 @@ package com.vlosco.backend.service;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vlosco.backend.dto.CreateAuthProviderDTO;
 import com.vlosco.backend.dto.ResponseDTO;
@@ -52,6 +53,7 @@ public class AuthProviderService {
      *         - 200 OK: Liste des AuthProviders si la récupération est réussie
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<AuthProvider>>> getAllAuthProviders() {
         ResponseDTO<List<AuthProvider>> response = new ResponseDTO<>();
         try {
@@ -75,6 +77,7 @@ public class AuthProviderService {
      *         - 404 NOT_FOUND: Si l'AuthProvider n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<AuthProvider>> getAuthProvider(Long id) {
         ResponseDTO<AuthProvider> response = new ResponseDTO<>();
         try {
@@ -104,6 +107,7 @@ public class AuthProviderService {
      *         - 400 BAD_REQUEST: Si les données sont invalides ou si le provider/user n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<AuthProvider>> createAuthProvider(CreateAuthProviderDTO createAuthProvider) {
         ResponseDTO<AuthProvider> response = new ResponseDTO<>();
         // Validation des données d'entrée
@@ -149,6 +153,7 @@ public class AuthProviderService {
      *         - 404 NOT_FOUND: Si l'AuthProvider à mettre à jour n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<AuthProvider>> updateAuthProvider(Long id, UpdateAuthProviderDTO updateAuthProvider) {
         ResponseDTO<AuthProvider> response = new ResponseDTO<>();
         // Validation des données d'entrée
@@ -216,6 +221,7 @@ public class AuthProviderService {
      *         - 404 NOT_FOUND: Si l'AuthProvider n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Void>> deleteAuthProvider(Long id) {
         ResponseDTO<Void> response = new ResponseDTO<>();
         try {
@@ -244,6 +250,7 @@ public class AuthProviderService {
      *         - 404 NOT_FOUND: Si aucun utilisateur n'a d'AuthProvider
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<User>>> getAllUsersWithAuthProviders() {
         ResponseDTO<List<User>> response = new ResponseDTO<>();
         try {
@@ -273,6 +280,7 @@ public class AuthProviderService {
      *         - 404 NOT_FOUND: Si l'utilisateur n'existe pas ou n'a pas d'AuthProvider
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<User>> getUserWithAuthProvider(String email) {
         ResponseDTO<User> response = new ResponseDTO<>();
         try {

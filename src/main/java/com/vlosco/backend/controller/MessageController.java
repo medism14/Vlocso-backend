@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Messages", description = "Endpoints pour la gestion des messages")
 @RestController
 @RequestMapping("/messages")
+@CrossOrigin(origins = "*")
 public class MessageController {
 
     private final MessageService messageService;

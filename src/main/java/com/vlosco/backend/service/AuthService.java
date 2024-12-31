@@ -10,6 +10,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vlosco.backend.dto.CreateAuthProviderDTO;
 import com.vlosco.backend.dto.ResponseDTO;
@@ -81,6 +82,7 @@ public class AuthService {
      *         - 409 CONFLICT : Un compte actif existe déjà avec cet email
      *         - 500 INTERNAL_SERVER_ERROR : Erreur technique lors du traitement
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Object>> registerUser(UserRegistrationDTO userRegister) {
         // Validation des données d'entrée
         if (userRegister == null || userRegister.getEmail() == null) {
@@ -166,6 +168,7 @@ public class AuthService {
      *         - 404 NOT_FOUND : Utilisateur non trouvé ou inactif
      *         - 500 INTERNAL_SERVER_ERROR : Erreur technique lors du traitement
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<Object>> loginUser(UserLoginDTO userLogin) {
         // Initialisation de la réponse
         ResponseDTO<Object> response = new ResponseDTO<>();
@@ -226,6 +229,7 @@ public class AuthService {
      *         - 409 CONFLICT : Compte existant sans provider
      *         - 500 INTERNAL_SERVER_ERROR : Erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Object>> registerUserProvider(UserRegistrationProviderDTO registrationDTO) {
         // Initialisation de la réponse
         ResponseDTO<Object> response = new ResponseDTO<>();
@@ -354,6 +358,7 @@ public class AuthService {
      * @return Utilisateur mis à jour et sauvegardé
      * @throws IllegalArgumentException si l'utilisateur ou le DTO est null
      */
+    @Transactional
     private User updateUserFromRegistrationDTO(User user, UserRegistrationProviderDTO registrationDTO) {
         if (user == null || registrationDTO == null) {
             throw new IllegalArgumentException("L'utilisateur et le DTO ne peuvent pas être null");
@@ -382,6 +387,7 @@ public class AuthService {
      *         - 404 NOT_FOUND : Utilisateur inexistant
      *         - 500 INTERNAL_SERVER_ERROR : Erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<Object>> loginUserProvider(UserLoginProviderDTO loginDTO) {
         ResponseDTO<Object> response = new ResponseDTO<>();
 
@@ -481,6 +487,7 @@ public class AuthService {
      *         - 401 UNAUTHORIZED : Token dans la liste noire
      *         - 500 INTERNAL_SERVER_ERROR : Erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<String>> refreshAccessToken(String refreshToken) {
         ResponseDTO<String> response = new ResponseDTO<>();
         try {
@@ -521,6 +528,7 @@ public class AuthService {
      *         - 404 NOT_FOUND : Utilisateur non trouvé
      *         - 500 INTERNAL_SERVER_ERROR : Erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Void>> logoutUser(String refreshToken) {
         ResponseDTO<Void> response = new ResponseDTO<>();
         try {

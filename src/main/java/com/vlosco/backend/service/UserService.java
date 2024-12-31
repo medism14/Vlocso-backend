@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vlosco.backend.dto.ResponseDTO;
 import com.vlosco.backend.dto.UserUpdateDTO;
@@ -48,6 +49,7 @@ public class UserService {
      *         - 204 NO_CONTENT: Si aucun utilisateur actif n'est trouvé
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<User>>> getAllUsers() {
         ResponseDTO<List<User>> response = new ResponseDTO<>();
 
@@ -78,6 +80,7 @@ public class UserService {
      *         - 404 NOT_FOUND: Si l'utilisateur n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<User>> getUserById(Long id) {
         ResponseDTO<User> response = new ResponseDTO<>();
 
@@ -109,6 +112,7 @@ public class UserService {
      *         - 404 NOT_FOUND: Si aucun utilisateur actif n'est trouvé avec cet email
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<User>> getUserByEmail(String email) {
         ResponseDTO<User> response = new ResponseDTO<>();
 
@@ -141,6 +145,7 @@ public class UserService {
      *         - 404 NOT_FOUND: Si aucun utilisateur actif n'est trouvé avec cet email
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Void>> launchVerifEmail(String email) {
         ResponseDTO<Void> response = new ResponseDTO<>();
 
@@ -182,6 +187,7 @@ public class UserService {
      *         - 404 NOT_FOUND: Si aucun utilisateur actif n'est trouvé avec cet email
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Void>> launchUpdatePassword(String email) {
         ResponseDTO<Void> response = new ResponseDTO<>();
 
@@ -224,6 +230,7 @@ public class UserService {
      *         - 404 NOT_FOUND: Si le token n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<User>> verifUpdatePassword(String passwordToken) {
         ResponseDTO<User> response = new ResponseDTO<>();
 
@@ -262,6 +269,7 @@ public class UserService {
      *         - 404 NOT_FOUND: Si l'utilisateur n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Void>> updatePassword(UserUpdatePasswordDto userUpdatePassword) {
         ResponseDTO<Void> response = new ResponseDTO<>();
 
@@ -301,6 +309,7 @@ public class UserService {
      *         - 404 NOT_FOUND: Si le token n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<String> verifyEmail(String emailToken) {
         try {
             Optional<User> userOptional = userRepository.findByEmailVerificationToken(emailToken);
@@ -343,6 +352,7 @@ public class UserService {
      *         - 404 NOT_FOUND: Si l'utilisateur n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<User>> updateUser(Long id, UserUpdateDTO userDetails) {
         ResponseDTO<User> response = new ResponseDTO<>();
 
@@ -411,6 +421,7 @@ public class UserService {
      *         - 404 NOT_FOUND: Si l'utilisateur n'existe pas
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Void>> removeUser(Long id) {
         ResponseDTO<Void> response = new ResponseDTO<>();
 

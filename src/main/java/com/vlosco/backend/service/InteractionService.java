@@ -10,6 +10,7 @@ import java.util.Optional;
 import com.vlosco.backend.repository.InteractionRepository;
 import com.vlosco.backend.dto.ResponseDTO;
 import com.vlosco.backend.model.Interaction;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InteractionService {
@@ -20,6 +21,7 @@ public class InteractionService {
         this.interactionRepository = interactionRepository;
     }
 
+    @Transactional
     public ResponseEntity<ResponseDTO<Interaction>> createInteraction(Interaction interaction) {
         ResponseDTO<Interaction> response = new ResponseDTO<>();
         try {
@@ -33,6 +35,7 @@ public class InteractionService {
         }
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<Interaction>>> getAllInteractions() {
         ResponseDTO<List<Interaction>> response = new ResponseDTO<>();
         try {
@@ -46,6 +49,7 @@ public class InteractionService {
         }
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<Interaction>> getInteractionById(Long id) {
         ResponseDTO<Interaction> response = new ResponseDTO<>();
         try {
@@ -64,6 +68,7 @@ public class InteractionService {
         }
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<Interaction>>> getInteractionsByUserId(Long userId) {
         ResponseDTO<List<Interaction>> response = new ResponseDTO<>();
         try {
@@ -77,6 +82,7 @@ public class InteractionService {
         }
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<Interaction>>> getUserSearchHistory(Long userId) {
         ResponseDTO<List<Interaction>> response = new ResponseDTO<>();
         try {
@@ -90,6 +96,7 @@ public class InteractionService {
         }
     }
 
+    @Transactional
     public ResponseEntity<ResponseDTO<Interaction>> updateInteraction(Long id, Interaction interactionDetails) {
         ResponseDTO<Interaction> response = new ResponseDTO<>();
         try {
@@ -115,6 +122,7 @@ public class InteractionService {
         }
     }
 
+    @Transactional
     public ResponseEntity<ResponseDTO<Void>> deleteInteraction(Long id) {
         ResponseDTO<Void> response = new ResponseDTO<>();
         try {

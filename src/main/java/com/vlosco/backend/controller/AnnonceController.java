@@ -26,7 +26,6 @@ import com.vlosco.backend.dto.AnnonceUpdateDTO;
 import com.vlosco.backend.dto.AnnonceWithUserDTO;
 import com.vlosco.backend.dto.PremiumAnnonceDTO;
 import com.vlosco.backend.dto.ResponseDTO;
-import com.vlosco.backend.enums.SortSearch;
 import com.vlosco.backend.model.Annonce;
 import com.vlosco.backend.service.AnnonceService;
 import com.vlosco.backend.service.ImageService;
@@ -217,25 +216,23 @@ public class AnnonceController {
                         @ApiResponse(responseCode = "204", description = "Aucune annonce ne correspond aux critères"),
                         @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
         })
-        @GetMapping("/filter")
+        @PostMapping("/filter")
         public ResponseEntity<ResponseDTO<List<Annonce>>> filterAnnonces(
-                        @Parameter(description = "ID de l'utilisateur") @RequestParam(required = false) Long vendorId,
-                        @Parameter(description = "État de l'annonce") @RequestParam(required = false) String annonce_state,
-                        @Parameter(description = "Titre de l'annonce") @RequestParam(required = false) String title,
+                        @Parameter(description = "Liste des IDs d'annonces à filtrer") @RequestBody List<Long> annonceIds,
                         @Parameter(description = "Statut premium") @RequestParam(required = false) Boolean premium,
-                        @Parameter(description = "Types de véhicules") @RequestParam(required = false) String vehicles,
+                        @Parameter(description = "Types de véhicules") @RequestParam(required = false) String typeVehicle,
                         @Parameter(description = "Critère de tri") @RequestParam(required = false) String sort,
                         @Parameter(description = "Type de transaction") @RequestParam(required = false) String transaction,
-                        @Parameter(description = "Critères additionnels") @RequestParam(required = false) String annonce,
                         @Parameter(description = "Kilométrage minimum") @RequestParam(required = false) Integer minKilometrage,
                         @Parameter(description = "Kilométrage maximum") @RequestParam(required = false) Integer maxKilometrage,
                         @Parameter(description = "Prix minimum") @RequestParam(required = false) Double minPrice,
                         @Parameter(description = "Prix maximum") @RequestParam(required = false) Double maxPrice,
                         @Parameter(description = "Ville") @RequestParam(required = false) String city,
-                        @Parameter(description = "Marque du véhicule") @RequestParam(required = false) String marque) {
-                return annonceService.filterAnnonces(vendorId, annonce_state, title, premium,
-                                vehicles, sort, transaction, annonce, minKilometrage, maxKilometrage,
-                                minPrice, maxPrice, city, marque);
+                        @Parameter(description = "Marque du véhicule") @RequestParam(required = false) String marque,
+                        @Parameter(description = "Modèle du véhicule") @RequestParam(required = false) String model) {
+                return annonceService.filterAnnonces(annonceIds, null, null, premium,
+                                typeVehicle, sort, transaction, null, minKilometrage, maxKilometrage,
+                                minPrice, maxPrice, city, marque, model);
         }
 
         @Operation(summary = "Récupérer les images d'une annonce", description = "Récupère toutes les images associées à une annonce spécifique")

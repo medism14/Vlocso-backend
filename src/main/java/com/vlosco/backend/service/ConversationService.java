@@ -87,7 +87,7 @@ public class ConversationService {
             }
 
             User buyer = buyerOptional.get();
-            User vendor = annonce.getVendor(); // Récupérer le vendeur depuis l'annonce
+            User vendor = annonce.getVendor();
 
             // Vérifier si une conversation existe déjà
             Optional<Conversation> existingConversation = conversationRepository.findByAnnonceAndBuyer(annonce, buyer);

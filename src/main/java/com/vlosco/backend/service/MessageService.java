@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vlosco.backend.dto.ConversationResponseDTO;
 import com.vlosco.backend.dto.MessageCreationDTO;
@@ -36,6 +37,7 @@ public class MessageService {
         this.conversationRepository = conversationRepository;
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<MessageResponseDTO>>> getAllMessages(Long userId) {
         ResponseDTO<List<MessageResponseDTO>> response = new ResponseDTO<>();
         try {
@@ -80,6 +82,7 @@ public class MessageService {
         }
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<MessageResponseDTO>> getMessageById(Long messageId, Long userId) {
         ResponseDTO<MessageResponseDTO> response = new ResponseDTO<>();
         try {
@@ -125,6 +128,7 @@ public class MessageService {
         }
     }
 
+    @Transactional
     public ResponseEntity<ResponseDTO<MessageResponseDTO>> createMessage(MessageCreationDTO messageCreationDTO,
             Long senderId) {
         ResponseDTO<MessageResponseDTO> response = new ResponseDTO<>();
@@ -201,6 +205,7 @@ public class MessageService {
         }
     }
 
+    @Transactional
     public ResponseEntity<ResponseDTO<MessageResponseDTO>> updateMessage(MessageUpdateDTO messageUpdateDTO,
             Long messageId, Long userId) {
         ResponseDTO<MessageResponseDTO> response = new ResponseDTO<>();
@@ -248,6 +253,7 @@ public class MessageService {
         }
     }
 
+    @Transactional
     public ResponseEntity<ResponseDTO<Void>> deleteMessage(Long messageId, Long userId) {
         ResponseDTO<Void> response = new ResponseDTO<>();
         try {
@@ -300,6 +306,7 @@ public class MessageService {
         }
     }
 
+    @Transactional
     public ResponseEntity<ResponseDTO<MessageResponseDTO>> markMessageAsRead(Long messageId, Long userId) {
         ResponseDTO<MessageResponseDTO> response = new ResponseDTO<>();
         try {
@@ -347,6 +354,7 @@ public class MessageService {
         }
     }
 
+    @Transactional(readOnly = true)
     private boolean isConversationActiveForUser(Conversation conversation, User user) {
         if (conversation.getBuyer().equals(user)) {
             return conversation.isActiveForBuyer();
@@ -356,6 +364,7 @@ public class MessageService {
         return false;
     }
 
+    @Transactional(readOnly = true)
     private boolean isConversationActiveForUserWithId(Long conversationId, Long userId) {
         Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
         ResponseDTO<User> userResponseDTO = userService.getUserById(userId).getBody();

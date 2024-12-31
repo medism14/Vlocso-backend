@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Tag(name = "Conversations", description = "Endpoints pour la gestion des conversations")
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/conversations")
 public class ConversationController {
 

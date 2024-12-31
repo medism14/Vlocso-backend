@@ -12,7 +12,7 @@ import com.vlosco.backend.model.User;
 import com.vlosco.backend.model.Annonce;
 
 public interface ConversationRepository extends JpaRepository<Conversation, Long> {
-    @Query("SELECT c FROM Conversation c WHERE c.buyer = :userId OR c.annonce.vendor = :userId")
+    @Query("SELECT c FROM Conversation c WHERE (c.buyer.id = :userId AND c.isActiveForBuyer = true) OR (c.annonce.vendor.id = :userId AND c.isActiveForVendor = true)")
     Optional<List<Conversation>> findConversationsByUser(@Param("userId") Long userId);
 
     Optional<Conversation> findByAnnonceAndBuyer(Annonce annonce, User buyer);

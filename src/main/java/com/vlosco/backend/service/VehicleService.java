@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vlosco.backend.dto.ResponseDTO;
 import com.vlosco.backend.dto.VehicleCreationDTO;
@@ -38,6 +39,7 @@ public class VehicleService {
      *         - 204 NO_CONTENT: Si aucun véhicule n'existe
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<Vehicle>>> getAllVehicles() {
         ResponseDTO<List<Vehicle>> response = new ResponseDTO<>();
 
@@ -69,6 +71,7 @@ public class VehicleService {
      *         - 404 NOT_FOUND: Si aucun véhicule ne correspond à l'ID
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<Vehicle>> getVehicleById(Long id) {
         ResponseDTO<Vehicle> response = new ResponseDTO<>();
 
@@ -101,6 +104,7 @@ public class VehicleService {
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique ou de
      *         validation
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Vehicle>> createVehicle(VehicleCreationDTO vehicleDto) {
         ResponseDTO<Vehicle> response = new ResponseDTO<>();
 
@@ -144,6 +148,7 @@ public class VehicleService {
      *         - 404 NOT_FOUND: Si aucun véhicule ne correspond à l'ID
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Vehicle>> updateVehicle(Long id, VehicleUpdateDTO updatedVehicle) {
         ResponseDTO<Vehicle> response = new ResponseDTO<>();
 
@@ -202,6 +207,7 @@ public class VehicleService {
      *         - 404 NOT_FOUND: Si aucun véhicule ne correspond à l'ID
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Void>> deleteVehicle(Long id) {
         ResponseDTO<Void> response = new ResponseDTO<>();
 

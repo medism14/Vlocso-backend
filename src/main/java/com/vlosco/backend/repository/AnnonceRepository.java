@@ -2,14 +2,15 @@ package com.vlosco.backend.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.vlosco.backend.dto.AnnonceDetailsDTO;
-import com.vlosco.backend.enums.SortSearch;
 import com.vlosco.backend.model.Annonce;
+import com.vlosco.backend.enums.AnnonceState;
 
 public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
         // Méthodes personnalisées basées sur le modèle Annonce
@@ -404,4 +405,91 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
                         @Param("maxKilometrage") Integer maxKilometrage,
                         @Param("sortBy") String sortBy,
                         @Param("excludedIds") String[] excludedIds);
+
+        List<Annonce> findByAnnonceStateAndEndDateBefore(AnnonceState state, LocalDateTime date);
+
+        @Query("SELECT a FROM Annonce a WHERE a.annonceState = :state AND a.endDate BETWEEN :startDate AND :endDate")
+        List<Annonce> findByAnnonceStateAndEndDateBetween(
+            @Param("state") AnnonceState state, 
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+        );
+
+        @Query("""
+        SELECT a FROM Annonce a 
+        WHERE (:premium IS NULL OR a.premium = :premium)
+        AND (:transaction IS NULL OR a.transaction = :transaction)
+        AND (:city IS NULL OR a.city = :city)
+        AND (:minKilometrage IS NULL OR CAST(a.vehicle.klmCounter AS integer) >= :minKilometrage)
+        AND (:maxKilometrage IS NULL OR CAST(a.vehicle.klmCounter AS integer) <= :maxKilometrage)
+        AND (:minPrice IS NULL OR CAST(a.price AS double) >= :minPrice)
+        AND (:maxPrice IS NULL OR CAST(a.price AS double) <= :maxPrice)
+        AND (:mark IS NULL OR a.vehicle.mark = :mark)
+        AND (:model IS NULL OR a.vehicle.model = :model)
+        AND (:type IS NULL OR a.vehicle.type = :type)
+        AND a.annonceId IN :annonceIds
+        """)
+        List<Annonce> filterAnnonces(
+            @Param("annonceIds") List<Long> annonceIds,
+            @Param("premium") Boolean premium,
+            @Param("transaction") String transaction,
+            @Param("city") String city,
+            @Param("minKilometrage") Integer minKilometrage,
+            @Param("maxKilometrage") Integer maxKilometrage,
+            @Param("minPrice") Double minPrice,
+            @Param("maxPrice") Double maxPrice,
+            @Param("mark") String mark,
+            @Param("model") String model,
+            @Param("type") String type
+        );
+
+        @Query("""
+            SELECT a FROM Annonce a 
+            JOIN PaymentPremium p ON p.annonce = a 
+            WHERE a.premium = :premium 
+            AND p.endDate < :date
+            AND p.status = 'CONFIRMED'
+            ORDER BY p.endDate DESC
+        """)
+        List<Annonce> findByPremiumAndPremiumEndDateBefore(
+            @Param("premium") boolean premium, 
+            @Param("date") LocalDateTime date
+        );
+
+        @Query("""
+            SELECT a FROM Annonce a 
+            JOIN PaymentPremium p ON p.annonce = a 
+            WHERE a.premium = :premium 
+            AND p.endDate BETWEEN :startDate AND :endDate
+            AND p.status = 'CONFIRMED'
+            ORDER BY p.endDate ASC
+        """)
+        List<Annonce> findByPremiumAndPremiumEndDateBetween(
+            @Param("premium") boolean premium,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+        );
+
+        @Query("""
+            SELECT a FROM Annonce a 
+            JOIN PaymentPremium p ON p.annonce = a 
+            WHERE a.premium = true 
+            AND p.endDate < :currentDate 
+            AND p.status = 'CONFIRMED'
+            ORDER BY p.endDate DESC
+        """)
+        List<Annonce> findPremiumAnnoncesWithExpiredPayment(@Param("currentDate") LocalDateTime currentDate);
+
+        @Query("""
+            SELECT a FROM Annonce a 
+            JOIN PaymentPremium p ON p.annonce = a 
+            WHERE a.premium = true 
+            AND p.endDate BETWEEN :startDate AND :endDate 
+            AND p.status = 'CONFIRMED'
+            ORDER BY p.endDate ASC
+        """)
+        List<Annonce> findPremiumAnnoncesWithPaymentExpiringBetween(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+        );
 }

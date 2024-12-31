@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vlosco.backend.dto.ResponseDTO;
 import com.vlosco.backend.model.Annonce;
@@ -42,6 +43,7 @@ public class ImageService {
      *         - 400 BAD_REQUEST: Si l'URL est null ou vide
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Image>> saveImage(String imageUrl, Long annonceId) {
         ResponseDTO<Image> response = new ResponseDTO<>();
         
@@ -86,6 +88,7 @@ public class ImageService {
      *         - 404 NOT_FOUND: Si aucune image ne correspond à l'ID
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<Image>> getImage(Long id) {
         ResponseDTO<Image> response = new ResponseDTO<>();
         
@@ -118,6 +121,7 @@ public class ImageService {
      *         - 404 NOT_FOUND: Si aucune image ne correspond à l'ID
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Void>> deleteImage(Long id) {
         ResponseDTO<Void> response = new ResponseDTO<>();
         
@@ -162,6 +166,7 @@ public class ImageService {
      *         - 404 NOT_FOUND: Si aucune image n'est associée à l'annonce
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional
     public ResponseEntity<ResponseDTO<Void>> deleteImagesByAnnonceId(Long annonceId) {
         ResponseDTO<Void> response = new ResponseDTO<>();
         
@@ -205,6 +210,7 @@ public class ImageService {
      *         - 204 NO_CONTENT: Si aucune image n'existe en base
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<Image>>> getAllImages() {
         ResponseDTO<List<Image>> response = new ResponseDTO<>();
         
@@ -236,6 +242,7 @@ public class ImageService {
      *         - 204 NO_CONTENT: Si aucune image n'est associée à l'annonce
      *         - 500 INTERNAL_SERVER_ERROR: En cas d'erreur technique
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<Image>>> getImagesByAnnonce(Long annonceId) {
         ResponseDTO<List<Image>> response = new ResponseDTO<>();
         
@@ -265,6 +272,7 @@ public class ImageService {
      * @param annonceId Identifiant unique de l'annonce pour laquelle récupérer les images.
      * @return ResponseEntity<ResponseDTO<List<String>>> contenant les URLs des images associées à l'annonce.
      */
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDTO<List<String>>> getImagesByAnnonceId(Long annonceId) {
         ResponseDTO<List<String>> response = new ResponseDTO<>();
         

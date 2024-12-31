@@ -12,4 +12,7 @@ public enum AnnonceState {
     
     @Schema(description = "Annonce vendue")
     SOLD,
+
+    @Schema(description = "Annonce expirée")
+    EXPIRED
 }

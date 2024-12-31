@@ -31,8 +31,8 @@ public class Notification {
     @Column(name = "url_image", nullable = true)
     private String urlImage;
 
-    @Column(name = "global", nullable = false)
-    private Boolean global;
+    @Column(name = "read_at", nullable = true)
+    private LocalDateTime readAt;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -49,6 +49,9 @@ public class Notification {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
@@ -88,12 +91,12 @@ public class Notification {
         this.urlImage = urlImage;
     }
 
-    public Boolean getGlobal() {
-        return global;
+    public LocalDateTime getReadAt() {
+        return readAt;
     }
 
-    public void setGlobal(Boolean global) {
-        this.global = global;
+    public void setReadAt(LocalDateTime readAt) {
+        this.readAt = readAt;
     }
 
     public User getUser() {
