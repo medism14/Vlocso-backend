@@ -9,9 +9,11 @@ import com.vlosco.backend.dto.AnnonceWithUserDTO;
 import com.vlosco.backend.dto.ConversationCreationDTO;
 import com.vlosco.backend.dto.ConversationResponseDTO;
 import com.vlosco.backend.dto.ConversationUpdateDTO;
+import com.vlosco.backend.dto.MessageResponseDTO;
 import com.vlosco.backend.dto.ResponseDTO;
 import com.vlosco.backend.model.Annonce;
 import com.vlosco.backend.model.Conversation;
+import com.vlosco.backend.model.Message;
 import com.vlosco.backend.model.User;
 import com.vlosco.backend.repository.ConversationRepository;
 import com.vlosco.backend.repository.UserRepository;
@@ -35,6 +37,20 @@ public class ConversationService {
         this.userRepository = userRepository;
     }
 
+    private List<MessageResponseDTO> convertToMessageResponseDTOs(List<Message> messages) {
+        return messages.stream()
+            .map(message -> new MessageResponseDTO(
+                message.getMessageId(),
+                message.getContent(), 
+                message.getCreatedAt(),
+                message.getReadTime(),
+                message.getSender(),
+                message.getReceiver(),
+                message.getConversation().getConversationId()
+            ))
+            .collect(Collectors.toList());
+    }
+
     public ResponseEntity<ResponseDTO<List<ConversationResponseDTO>>> getAllConversations() {
         ResponseDTO<List<ConversationResponseDTO>> response;
         try {
@@ -47,7 +63,8 @@ public class ConversationService {
                 dto.setVendor(conversation.getAnnonce().getVendor());
                 dto.setActiveForBuyer(conversation.isActiveForBuyer());
                 dto.setActiveForVendor(conversation.isActiveForVendor());
-                dto.setMessages(conversation.getMessages());
+                dto.setMessages(convertToMessageResponseDTOs(conversation.getMessages()));
+                dto.setCreatedAt(conversation.getCreatedAt());
                 return dto;
             }).toList();
             response = new ResponseDTO<>(conversationResponseDTOs, "Conversations récupérées avec succès");
@@ -114,7 +131,8 @@ public class ConversationService {
             conversationResponseDTO.setVendor(vendor);
             conversationResponseDTO.setActiveForBuyer(true);
             conversationResponseDTO.setActiveForVendor(true);
-            conversationResponseDTO.setMessages(savedConversation.getMessages());
+            conversationResponseDTO.setMessages(convertToMessageResponseDTOs(savedConversation.getMessages()));
+            conversationResponseDTO.setCreatedAt(savedConversation.getCreatedAt());
 
             response = new ResponseDTO<>(conversationResponseDTO, "Conversation créée avec succès");
             return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -143,7 +161,8 @@ public class ConversationService {
                             dto.setVendor(conversation.getAnnonce().getVendor());
                             dto.setActiveForBuyer(conversation.isActiveForBuyer());
                             dto.setActiveForVendor(conversation.isActiveForVendor());
-                            dto.setMessages(conversation.getMessages());
+                            dto.setMessages(convertToMessageResponseDTOs(conversation.getMessages()));
+                            dto.setCreatedAt(conversation.getCreatedAt());
                             return dto;
                         })
                         .collect(Collectors.toList());
@@ -182,7 +201,8 @@ public class ConversationService {
             conversationResponseDTO.setVendor(conversation.getAnnonce().getVendor());
             conversationResponseDTO.setActiveForBuyer(conversation.isActiveForBuyer());
             conversationResponseDTO.setActiveForVendor(conversation.isActiveForVendor());
-            conversationResponseDTO.setMessages(conversation.getMessages());
+            conversationResponseDTO.setMessages(convertToMessageResponseDTOs(conversation.getMessages()));
+            conversationResponseDTO.setCreatedAt(conversation.getCreatedAt());
             response = new ResponseDTO<>(conversationResponseDTO, "Conversation trouvée");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
@@ -218,7 +238,8 @@ public class ConversationService {
             conversationResponseDTO.setVendor(savedConversation.getAnnonce().getVendor());
             conversationResponseDTO.setActiveForBuyer(savedConversation.isActiveForBuyer());
             conversationResponseDTO.setActiveForVendor(savedConversation.isActiveForVendor());
-            conversationResponseDTO.setMessages(savedConversation.getMessages());
+            conversationResponseDTO.setMessages(convertToMessageResponseDTOs(savedConversation.getMessages()));
+            conversationResponseDTO.setCreatedAt(savedConversation.getCreatedAt());
 
             response = new ResponseDTO<>(conversationResponseDTO, "Conversation mise à jour avec succès");
             return new ResponseEntity<>(response, HttpStatus.OK);

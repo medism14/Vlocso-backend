@@ -1,10 +1,10 @@
 package com.vlosco.backend.dto;
 
 import com.vlosco.backend.model.User;
-import com.vlosco.backend.model.Message;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
+import java.time.LocalDateTime;
 
 @Schema(description = "DTO pour la réponse d'une conversation")
 public class ConversationResponseDTO {
@@ -22,13 +22,16 @@ public class ConversationResponseDTO {
     private User vendor;
 
     @Schema(description = "Liste des messages dans la conversation")
-    private List<Message> messages;
+    private List<MessageResponseDTO> messages;
 
     @Schema(description = "Indique si la conversation est active pour le vendeur")
     private boolean isActiveForVendor;
 
     @Schema(description = "Indique si la conversation est active pour l'acheteur")
     private boolean isActiveForBuyer;
+
+    @Schema(description = "Date de création de la conversation")
+    private LocalDateTime createdAt;
 
     // Getters et Setters
     public Long getConversationId() {
@@ -63,11 +66,11 @@ public class ConversationResponseDTO {
         this.vendor = vendor;
     }
 
-    public List<Message> getMessages() {
+    public List<MessageResponseDTO> getMessages() {
         return messages;
     }
 
-    public void setMessages(List<Message> messages) {
+    public void setMessages(List<MessageResponseDTO> messages) {
         this.messages = messages;
     }
 
@@ -85,5 +88,13 @@ public class ConversationResponseDTO {
 
     public void setActiveForBuyer(boolean isActiveForBuyer) {
         this.isActiveForBuyer = isActiveForBuyer;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

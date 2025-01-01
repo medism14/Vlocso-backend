@@ -99,7 +99,7 @@ public class User {
     private List<Annonce> annonces;
 
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference("user-interactions")
+    @JsonBackReference
     private List<Interaction> interactions;
 
     @OneToMany(mappedBy = "user")
