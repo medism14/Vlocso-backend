@@ -42,7 +42,7 @@ public class ConversationService {
             List<ConversationResponseDTO> conversationResponseDTOs = conversations.stream().map(conversation -> {
                 ConversationResponseDTO dto = new ConversationResponseDTO();
                 dto.setConversationId(conversation.getConversationId());
-                dto.setAnnonce(conversation.getAnnonce());
+                dto.setAnnonceWithUserDto(annonceService.convertToAnnonceWithUserDTO(conversation.getAnnonce()));
                 dto.setBuyer(conversation.getBuyer());
                 dto.setVendor(conversation.getAnnonce().getVendor());
                 dto.setActiveForBuyer(conversation.isActiveForBuyer());
@@ -109,7 +109,7 @@ public class ConversationService {
             // Créer le DTO de réponse
             ConversationResponseDTO conversationResponseDTO = new ConversationResponseDTO();
             conversationResponseDTO.setConversationId(savedConversation.getConversationId());
-            conversationResponseDTO.setAnnonce(annonce);
+            conversationResponseDTO.setAnnonceWithUserDto(annonceService.convertToAnnonceWithUserDTO(annonce));
             conversationResponseDTO.setBuyer(buyer);
             conversationResponseDTO.setVendor(vendor);
             conversationResponseDTO.setActiveForBuyer(true);
@@ -138,7 +138,7 @@ public class ConversationService {
                         .map(conversation -> {
                             ConversationResponseDTO dto = new ConversationResponseDTO();
                             dto.setConversationId(conversation.getConversationId());
-                            dto.setAnnonce(conversation.getAnnonce());
+                            dto.setAnnonceWithUserDto(annonceService.convertToAnnonceWithUserDTO(conversation.getAnnonce()));
                             dto.setBuyer(conversation.getBuyer());
                             dto.setVendor(conversation.getAnnonce().getVendor());
                             dto.setActiveForBuyer(conversation.isActiveForBuyer());
@@ -177,7 +177,7 @@ public class ConversationService {
             Conversation conversation = conversationOptional.get();
             ConversationResponseDTO conversationResponseDTO = new ConversationResponseDTO();
             conversationResponseDTO.setConversationId(conversation.getConversationId());
-            conversationResponseDTO.setAnnonce(conversation.getAnnonce());
+            conversationResponseDTO.setAnnonceWithUserDto(annonceService.convertToAnnonceWithUserDTO(conversation.getAnnonce()));
             conversationResponseDTO.setBuyer(conversation.getBuyer());
             conversationResponseDTO.setVendor(conversation.getAnnonce().getVendor());
             conversationResponseDTO.setActiveForBuyer(conversation.isActiveForBuyer());
@@ -213,7 +213,7 @@ public class ConversationService {
             Conversation savedConversation = conversationRepository.save(conversation);
             ConversationResponseDTO conversationResponseDTO = new ConversationResponseDTO();
             conversationResponseDTO.setConversationId(savedConversation.getConversationId());
-            conversationResponseDTO.setAnnonce(savedConversation.getAnnonce());
+            conversationResponseDTO.setAnnonceWithUserDto(annonceService.convertToAnnonceWithUserDTO(savedConversation.getAnnonce()));
             conversationResponseDTO.setBuyer(savedConversation.getBuyer());
             conversationResponseDTO.setVendor(savedConversation.getAnnonce().getVendor());
             conversationResponseDTO.setActiveForBuyer(savedConversation.isActiveForBuyer());

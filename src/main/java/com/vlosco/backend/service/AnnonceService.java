@@ -1197,4 +1197,11 @@ public class AnnonceService {
         }
     }
 
+    public AnnonceWithUserDTO convertToAnnonceWithUserDTO(Annonce annonce) {
+        if (annonce == null) {
+            return null;
+        }
+        return new AnnonceWithUserDTO(annonce, annonce.getVendor());
+    }
+
 }

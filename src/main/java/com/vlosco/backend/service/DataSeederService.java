@@ -170,8 +170,8 @@ public class DataSeederService {
                 namesMap.add("Marchand");
 
                 List<String> firstNames = new ArrayList<>(firstNamesMap.keySet());
-                String[] emailDomains = {"gmail.com", "yahoo.fr", "hotmail.com", "outlook.fr", "orange.fr"};
-                String[] emailSeparators = {".", "_", "-"};
+                String[] emailDomains = { "gmail.com", "yahoo.fr", "hotmail.com", "outlook.fr", "orange.fr" };
+                String[] emailSeparators = { ".", "_", "-" };
 
                 for (int i = 0; i < 1500; i++) {
                         User user = new User();
@@ -181,25 +181,27 @@ public class DataSeederService {
                         // Génération d'email unique
                         String email;
                         do {
-                            String separator = emailSeparators[random.nextInt(emailSeparators.length)];
-                            String domain = emailDomains[random.nextInt(emailDomains.length)];
-                            int randomNum = random.nextInt(1000);
-                            
-                            // Mélange aléatoire de prénom/nom
-                            email = random.nextBoolean() 
-                                ? firstName.toLowerCase() + separator + lastName.toLowerCase() + randomNum + "@" + domain
-                                : lastName.toLowerCase() + separator + firstName.toLowerCase() + randomNum + "@" + domain;
-                                
+                                String separator = emailSeparators[random.nextInt(emailSeparators.length)];
+                                String domain = emailDomains[random.nextInt(emailDomains.length)];
+                                int randomNum = random.nextInt(1000);
+
+                                // Mélange aléatoire de prénom/nom
+                                email = random.nextBoolean()
+                                                ? firstName.toLowerCase() + separator + lastName.toLowerCase()
+                                                                + randomNum + "@" + domain
+                                                : lastName.toLowerCase() + separator + firstName.toLowerCase()
+                                                                + randomNum + "@" + domain;
+
                         } while (usedEmails.contains(email));
-                        
+
                         usedEmails.add(email);
-                        
-                        user.setFirstName(firstName); 
+
+                        user.setFirstName(firstName);
                         user.setLastName(lastName);
                         user.setEmail(email);
                         user.setPassword(passwordService.hashPassword("password@123"));
                         user.setPhoneNumber(
-                                        faker.numerify("+33 " + (random.nextBoolean() ? "6" : "7") + "## ## ## ##"));
+                                        faker.numerify("+33 " + (random.nextBoolean() ? "6" : "7") + " ## ## ## ##"));
                         user.setCity(faker.options().option(AnnonceData.CITY_ITEMS));
                         user.setBirthDate(LocalDate.now().minusYears(faker.number().numberBetween(20, 55)));
                         user.setEmailVerified(true);
@@ -273,7 +275,7 @@ public class DataSeederService {
                                                 "https://serveur-statique.jam-difus.com/_telechargement/luminis/film/webp-tesla-arriere-h8002a.webp?v=1",
                                                 "https://media.istockphoto.com/id/1150931120/fr/photo/illustration-3d-de-la-voiture-compacte-blanche-générique-vue-de-face.jpg?s=612x612&w=0&k=20&c=xGw7XJJlXXB1Kmcv9TAxoXln-ancfIX-W3lAJlL9Px0=" });
                                 put("Gris", new String[] {
-                                                "https://img.over-blog-kiwi.com/0/93/23/39/20170505/ob_322535_p2.jpg",
+                                                "https://bialekpeinture.fr/img/cms/vw-grey-nardo.jpg",
                                                 "https://www.elitecovering.fr/865/gris-mat.jpg",
                                                 "https://classic-auto.fr/wp-content/uploads/2022/11/RS7-Sportback-Nardo-gris-1024x543.png",
                                                 "https://journalauto.com/wp-content/uploads/2023/01/Austral-gris.jpg",
@@ -447,7 +449,8 @@ public class DataSeederService {
                                 annonceDetails.setQuantity(1);
                         } else {
                                 annonceDetails.setPrice(
-                                                Double.valueOf(faker.number().numberBetween(minRentalPrice, maxRentalPrice)));
+                                                Double.valueOf(faker.number().numberBetween(minRentalPrice,
+                                                                maxRentalPrice)));
                                 annonceDetails.setQuantity(1);
                         }
 
@@ -455,7 +458,7 @@ public class DataSeederService {
                         vehicleDetails.setKlmCounter(kmCount);
                         annonceDetails.setCity(city);
                         annonceDetails.setPhoneNumber(
-                                        faker.numerify("+33 " + (random.nextBoolean() ? "6" : "7") + "## ## ## ##"));
+                                        faker.numerify("+33 " + (random.nextBoolean() ? "6" : "7") + " ## ## ## ##"));
                         annonceDetails.setUserId(users.get(random.nextInt(users.size())).getUserId());
                         annonceCreationDTO.setAnnonce(annonceDetails);
 
@@ -575,10 +578,11 @@ public class DataSeederService {
                 }
         }
 
-        private List<String> getRandomImages(String color, String typeVehicle, HashMap<String, String[]> imagesCars, HashMap<String, String[]> imagesMotos) {
+        private List<String> getRandomImages(String color, String typeVehicle, HashMap<String, String[]> imagesCars,
+                        HashMap<String, String[]> imagesMotos) {
                 List<String> images = new ArrayList<>();
                 String[] availableImages;
-                
+
                 if (typeVehicle.equals("Voiture")) {
                         availableImages = imagesCars.get(color);
                 } else {
@@ -588,13 +592,13 @@ public class DataSeederService {
                 if (availableImages != null) {
                         // Nombre aléatoire d'images entre 2 et 5
                         int numberOfImages = random.nextInt(4) + 2; // random.nextInt(4) donne 0-3, +2 donne 2-5
-                        
+
                         // Créer une liste d'indices disponibles
                         List<Integer> indices = new ArrayList<>();
                         for (int i = 0; i < availableImages.length; i++) {
                                 indices.add(i);
                         }
-                        
+
                         // Sélectionner aléatoirement les images
                         for (int i = 0; i < Math.min(numberOfImages, availableImages.length); i++) {
                                 int randomIndex = random.nextInt(indices.size());
@@ -602,7 +606,7 @@ public class DataSeederService {
                                 images.add(availableImages[selectedIndex]);
                         }
                 }
-                
+
                 return images;
         }
 }

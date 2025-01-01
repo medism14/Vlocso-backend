@@ -1,6 +1,5 @@
 package com.vlosco.backend.dto;
 
-import com.vlosco.backend.model.Annonce;
 import com.vlosco.backend.model.User;
 import com.vlosco.backend.model.Message;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,7 +13,7 @@ public class ConversationResponseDTO {
     private Long conversationId;
 
     @Schema(description = "Annonce associée à la conversation")
-    private Annonce annonce;
+    private AnnonceWithUserDTO annoncewithUser;
 
     @Schema(description = "Acheteur participant à la conversation")
     private User buyer;
@@ -40,12 +39,12 @@ public class ConversationResponseDTO {
         this.conversationId = conversationId;
     }
 
-    public Annonce getAnnonce() {
-        return annonce;
+    public AnnonceWithUserDTO getAnnonceWithUserDTO() {
+        return annoncewithUser;
     }
 
-    public void setAnnonce(Annonce annonce) {
-        this.annonce = annonce;
+    public void setAnnonceWithUserDto(AnnonceWithUserDTO annoncewithUser) {
+        this.annoncewithUser = annoncewithUser;
     }
 
     public User getBuyer() {
