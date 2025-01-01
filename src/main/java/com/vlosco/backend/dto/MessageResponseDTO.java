@@ -8,16 +8,18 @@ public class MessageResponseDTO {
     private Long messageId;
     private String content;
     private LocalDateTime createdAt;
-    private LocalDateTime readAt; // Ajout de readAt
+    private LocalDateTime updatedAt;
+    private LocalDateTime readAt;
     private User sender;
-    private User receiver;
+    private User receiver; 
     private Long conversationId;
 
-    public MessageResponseDTO(Long messageId, String content, LocalDateTime createdAt, LocalDateTime readAt, User sender, User receiver, Long conversationId) {
+    public MessageResponseDTO(Long messageId, String content, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime readAt, User sender, User receiver, Long conversationId) {
         this.messageId = messageId;
         this.content = content;
         this.createdAt = createdAt;
-        this.readAt = readAt; // Initialisation de readAt
+        this.updatedAt = updatedAt;
+        this.readAt = readAt;
         this.sender = sender;
         this.receiver = receiver;
         this.conversationId = conversationId;
@@ -47,11 +49,19 @@ public class MessageResponseDTO {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getReadAt() { // Ajout du getter pour readAt
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getReadAt() {
         return readAt;
     }
 
-    public void setReadAt(LocalDateTime readAt) { // Ajout du setter pour readAt
+    public void setReadAt(LocalDateTime readAt) {
         this.readAt = readAt;
     }
 

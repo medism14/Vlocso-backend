@@ -43,6 +43,7 @@ public class ConversationService {
                 message.getMessageId(),
                 message.getContent(), 
                 message.getCreatedAt(),
+                message.getUpdatedAt(),
                 message.getReadTime(),
                 message.getSender(),
                 message.getReceiver(),
