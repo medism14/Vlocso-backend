@@ -4,18 +4,21 @@ import java.util.Optional;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.vlosco.backend.model.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    public Optional<User> findByEmailAndIsActiveTrue(String email);
+    @Query("SELECT u FROM User u WHERE u.email = :email AND u.isActive = true")
+    public Optional<User> findByEmailAndIsActiveTrue(@Param("email") String email);
 
-    public Optional<User> findByEmail(String email);
+    public Optional<User> findByEmail(@Param("email") String email);
 
-    public Optional<User> findByEmailVerificationToken(String emailVerificationToken);
+    public Optional<User> findByEmailVerificationToken(@Param("emailVerificationToken") String emailVerificationToken);
 
-    public Optional<User> findByPasswordVerificationToken(String passwordVerificationToken);
+    public Optional<User> findByPasswordVerificationToken(@Param("passwordVerificationToken") String passwordVerificationToken);
 
     public List<User> findByIsActiveTrue();
     
@@ -29,10 +32,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     public List<User> findByIsActiveFalseOrderByCreatedAtDesc();
     
-    public Optional<User> findByUserIdAndIsActiveTrue(Long userId);
+    public Optional<User> findByUserIdAndIsActiveTrue(@Param("userId") Long userId);
     
-    public Optional<User> findByUserIdAndIsActiveFalse(Long userId);
+    public Optional<User> findByUserIdAndIsActiveFalse(@Param("userId") Long userId);
     
-    public List<User> findByEmailContainingAndIsActiveTrue(String emailPattern);
+    public List<User> findByEmailContainingAndIsActiveTrue(@Param("emailPattern") String emailPattern);
     
 }

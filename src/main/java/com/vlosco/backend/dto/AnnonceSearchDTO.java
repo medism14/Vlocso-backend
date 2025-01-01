@@ -3,7 +3,7 @@ package com.vlosco.backend.dto;
 public class AnnonceSearchDTO {
     private String searchText;
     private String[] excludedIds;
-    private Integer nbAnnonces; // Ajout de nbAnnonces
+    private Integer nbAnnonces; 
 
     // Getters
     public String getSearchText() {

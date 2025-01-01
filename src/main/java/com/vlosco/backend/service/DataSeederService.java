@@ -22,10 +22,12 @@ import jakarta.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +83,7 @@ public class DataSeederService {
         @Transactional
         private void seedUsersInBatches() {
                 List<User> userBatch = new ArrayList<>();
+                Set<String> usedEmails = new HashSet<>();
                 Map<String, String> firstNamesMap = new HashMap<>();
                 List<String> namesMap = new ArrayList<>();
                 firstNamesMap.put("Thomas",
@@ -167,15 +170,33 @@ public class DataSeederService {
                 namesMap.add("Marchand");
 
                 List<String> firstNames = new ArrayList<>(firstNamesMap.keySet());
+                String[] emailDomains = {"gmail.com", "yahoo.fr", "hotmail.com", "outlook.fr", "orange.fr"};
+                String[] emailSeparators = {".", "_", "-"};
 
                 for (int i = 0; i < 1500; i++) {
                         User user = new User();
                         String firstName = firstNames.get(random.nextInt(firstNames.size()));
                         String lastName = namesMap.get(random.nextInt(namesMap.size()));
 
-                        user.setFirstName(firstName);
+                        // Génération d'email unique
+                        String email;
+                        do {
+                            String separator = emailSeparators[random.nextInt(emailSeparators.length)];
+                            String domain = emailDomains[random.nextInt(emailDomains.length)];
+                            int randomNum = random.nextInt(1000);
+                            
+                            // Mélange aléatoire de prénom/nom
+                            email = random.nextBoolean() 
+                                ? firstName.toLowerCase() + separator + lastName.toLowerCase() + randomNum + "@" + domain
+                                : lastName.toLowerCase() + separator + firstName.toLowerCase() + randomNum + "@" + domain;
+                                
+                        } while (usedEmails.contains(email));
+                        
+                        usedEmails.add(email);
+                        
+                        user.setFirstName(firstName); 
                         user.setLastName(lastName);
-                        user.setEmail(firstName.toLowerCase() + "." + lastName.toLowerCase() + "@gmail.com");
+                        user.setEmail(email);
                         user.setPassword(passwordService.hashPassword("password@123"));
                         user.setPhoneNumber(
                                         faker.numerify("+33 " + (random.nextBoolean() ? "6" : "7") + "## ## ## ##"));
@@ -349,7 +370,7 @@ public class DataSeederService {
                         }
                 };
 
-                for (int i = 0; i < 2000; i++) {
+                for (int i = 0; i < 2500; i++) {
                         AnnonceCreationDTO annonceCreationDTO = new AnnonceCreationDTO();
                         AnnonceDetailsCreationDTO annonceDetails = new AnnonceDetailsCreationDTO();
                         VehicleCreationDTO vehicleDetails = new VehicleCreationDTO();
@@ -509,7 +530,7 @@ public class DataSeederService {
                         if (random.nextInt(100) < 5)
                                 continue;
 
-                        int numberOfInteractions = random.nextInt(20) + 1;
+                        int numberOfInteractions = random.nextInt(50) + 1;
                         for (int j = 0; j < numberOfInteractions; j++) {
                                 Interaction interaction = new Interaction();
                                 Annonce annonce = annonces.get(random.nextInt(annonces.size()));

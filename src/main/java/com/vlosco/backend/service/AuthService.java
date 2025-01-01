@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +33,7 @@ import com.vlosco.backend.repository.UserRepository;
 
 /**
  * Service gérant l'authentification et l'inscription des utilisateurs.
- * Fournit des méthodes pour l'inscription classique, la connexion, 
+ * Fournit des méthodes pour l'inscription classique, la connexion,
  * et l'authentification via providers externes (Google, Facebook, etc.).
  */
 @Service
@@ -50,13 +51,17 @@ public class AuthService {
      * Constructeur du service d'authentification.
      * Initialise les dépendances nécessaires via injection.
      *
-     * @param userRepository Repository pour la gestion des utilisateurs
-     * @param passwordService Service de gestion des mots de passe
-     * @param jwtService Service de gestion des tokens JWT
-     * @param emailService Service d'envoi d'emails
-     * @param refreshTokenBlacklistRepository Repository pour la gestion de la liste noire des tokens
-     * @param providerRepository Repository pour la gestion des providers d'authentification
-     * @param authProviderService Service de gestion des providers d'authentification
+     * @param userRepository                  Repository pour la gestion des
+     *                                        utilisateurs
+     * @param passwordService                 Service de gestion des mots de passe
+     * @param jwtService                      Service de gestion des tokens JWT
+     * @param emailService                    Service d'envoi d'emails
+     * @param refreshTokenBlacklistRepository Repository pour la gestion de la liste
+     *                                        noire des tokens
+     * @param providerRepository              Repository pour la gestion des
+     *                                        providers d'authentification
+     * @param authProviderService             Service de gestion des providers
+     *                                        d'authentification
      */
     @Autowired
     public AuthService(UserRepository userRepository, PasswordService passwordService, JwtService jwtService,
@@ -73,9 +78,11 @@ public class AuthService {
 
     /**
      * Enregistre un nouvel utilisateur ou réactive un compte existant.
-     * Gère la validation des données, le hashage du mot de passe et l'envoi d'email de vérification.
+     * Gère la validation des données, le hashage du mot de passe et l'envoi d'email
+     * de vérification.
      *
-     * @param userRegister DTO contenant les informations d'inscription (nom, prénom, email, etc.)
+     * @param userRegister DTO contenant les informations d'inscription (nom,
+     *                     prénom, email, etc.)
      * @return ResponseEntity contenant :
      *         - 200 OK : Inscription réussie avec tokens d'authentification
      *         - 400 BAD_REQUEST : Données d'inscription invalides ou incomplètes
@@ -90,7 +97,6 @@ public class AuthService {
                     new ResponseDTO<>(null, "Les informations d'inscription sont incomplètes"),
                     HttpStatus.BAD_REQUEST);
         }
-
 
         try {
             User user;
@@ -157,12 +163,14 @@ public class AuthService {
 
     /**
      * Authentifie un utilisateur avec son email et mot de passe.
-     * Vérifie que l'utilisateur existe, est actif et que le mot de passe correspond.
+     * Vérifie que l'utilisateur existe, est actif et que le mot de passe
+     * correspond.
      * Ne fonctionne que pour les utilisateurs de type REGULAR.
      *
      * @param userLogin DTO contenant l'email et le mot de passe de l'utilisateur
      * @return ResponseEntity contenant :
-     *         - 200 OK : Authentification réussie avec tokens et informations utilisateur
+     *         - 200 OK : Authentification réussie avec tokens et informations
+     *         utilisateur
      *         - 400 BAD_REQUEST : Données de connexion manquantes ou invalides
      *         - 401 UNAUTHORIZED : Mot de passe incorrect
      *         - 404 NOT_FOUND : Utilisateur non trouvé ou inactif
@@ -182,6 +190,7 @@ public class AuthService {
 
             // Recherche de l'utilisateur actif par email
             Optional<User> userOptional = userRepository.findByEmailAndIsActiveTrue(userLogin.getEmail());
+
 
             // Vérifie si l'utilisateur existe et est de type REGULAR
             if (userOptional.isPresent()) {
@@ -222,7 +231,8 @@ public class AuthService {
      * Enregistre un utilisateur via un fournisseur d'authentification externe.
      * Gère la création d'un nouveau compte ou la mise à jour d'un compte existant.
      *
-     * @param registrationDTO DTO contenant les informations d'inscription (email, provider, etc.)
+     * @param registrationDTO DTO contenant les informations d'inscription (email,
+     *                        provider, etc.)
      * @return ResponseEntity contenant :
      *         - 200 OK : Inscription réussie avec tokens d'authentification
      *         - 400 BAD_REQUEST : Provider inexistant ou données invalides
@@ -353,7 +363,7 @@ public class AuthService {
      * Met à jour un utilisateur existant avec les informations d'un DTO.
      * Actualise tous les champs modifiables de l'utilisateur.
      *
-     * @param user Utilisateur à mettre à jour
+     * @param user            Utilisateur à mettre à jour
      * @param registrationDTO DTO contenant les nouvelles informations
      * @return Utilisateur mis à jour et sauvegardé
      * @throws IllegalArgumentException si l'utilisateur ou le DTO est null
@@ -447,7 +457,7 @@ public class AuthService {
      * @param user Utilisateur pour lequel créer la réponse
      * @return AuthResponse contenant tokens et informations utilisateur
      * @throws IllegalArgumentException si l'utilisateur est null
-     * @throws RuntimeException si erreur lors de la création des tokens
+     * @throws RuntimeException         si erreur lors de la création des tokens
      */
     private AuthResponse createAuthResponse(User user) {
         if (user == null) {

@@ -39,7 +39,7 @@ public class Vehicle {
     @Column(name = "gearbox", nullable = false)
     private String gearbox;
 
-    @Column(name = "klm_counter", nullable = false)
+    @Column(name = "klm_counter")
     private Integer klmCounter;
 
     @Column(name = "condition", nullable = false)

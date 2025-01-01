@@ -239,7 +239,7 @@ public class AnnonceService {
             if (recommendedAnnonces.size() < nbAnnonces) {
                 response.setMessage("Il n'y a plus d'annonces à recommander");
                 response.setData(new ArrayList<>());
-                return new ResponseEntity<>(response, HttpStatus.OK);
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
 
             // Convertir la liste d'Annonce en AnnonceWithUserDTO

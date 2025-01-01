@@ -272,15 +272,4 @@ public class AnnonceController {
                 return annonceService.recommandationUserNotConnected(nbAnnonces);
         }
 
-        @GetMapping("/cities")
-        @Operation(summary = "Récupérer toutes les villes", description = "Retourne la liste de toutes les villes où il y a des annonces")
-        @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "Liste des villes récupérée avec succès"),
-                        @ApiResponse(responseCode = "204", description = "Aucune ville trouvée"),
-                        @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
-        })
-        public ResponseEntity<ResponseDTO<List<String>>> getAllCities() {
-                return annonceService.getAllCities();
-        }
-
 }
