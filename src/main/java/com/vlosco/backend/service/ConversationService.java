@@ -83,6 +83,25 @@ public class ConversationService {
             Long annonceId = conversationCreationDTO.getAnnonceId();
             Long buyerId = conversationCreationDTO.getBuyerId();
 
+            // Vérifier si une conversation existe déjà avant de récupérer l'annonce et l'acheteur
+            Optional<Conversation> existingConversation = conversationRepository.findByAnnonceIdAndBuyerId(annonceId, buyerId);
+            if (existingConversation.isPresent()) {
+                // Convertir la conversation existante en DTO et la retourner
+                Conversation conversation = existingConversation.get();
+                ConversationResponseDTO conversationResponseDTO = new ConversationResponseDTO();
+                conversationResponseDTO.setConversationId(conversation.getConversationId());
+                conversationResponseDTO.setAnnonceWithUserDto(annonceService.convertToAnnonceWithUserDTO(conversation.getAnnonce()));
+                conversationResponseDTO.setBuyer(conversation.getBuyer());
+                conversationResponseDTO.setVendor(conversation.getAnnonce().getVendor());
+                conversationResponseDTO.setActiveForBuyer(conversation.isActiveForBuyer());
+                conversationResponseDTO.setActiveForVendor(conversation.isActiveForVendor());
+                conversationResponseDTO.setMessages(convertToMessageResponseDTOs(conversation.getMessages()));
+                conversationResponseDTO.setCreatedAt(conversation.getCreatedAt());
+                
+                response = new ResponseDTO<>(conversationResponseDTO, "Conversation existante récupérée");
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            }
+
             // Récupérer l'annonce et l'acheteur par leurs identifiants
             ResponseEntity<ResponseDTO<AnnonceWithUserDTO>> annonceResponse = annonceService.getAnnonceById(annonceId);
             Optional<User> buyerOptional = userRepository.findById(buyerId);
@@ -107,15 +126,6 @@ public class ConversationService {
             User buyer = buyerOptional.get();
             User vendor = annonce.getVendor();
 
-            // Vérifier si une conversation existe déjà
-            Optional<Conversation> existingConversation = conversationRepository.findByAnnonceAndBuyer(annonce, buyer);
-
-            if (existingConversation.isPresent()) {
-                response = new ResponseDTO<>(
-                        "Une conversation existe déjà pour cette annonce et cet acheteur");
-                return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-            }
-
             Conversation conversation = new Conversation();
             conversation.setAnnonce(annonce);
             conversation.setBuyer(buyer);
@@ -138,7 +148,8 @@ public class ConversationService {
             response = new ResponseDTO<>(conversationResponseDTO, "Conversation créée avec succès");
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
-            response = new ResponseDTO<>("Erreur lors de la création de la conversation");
+            e.printStackTrace(); // Pour avoir plus de détails sur l'erreur
+            response = new ResponseDTO<>("Erreur lors de la création de la conversation: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
