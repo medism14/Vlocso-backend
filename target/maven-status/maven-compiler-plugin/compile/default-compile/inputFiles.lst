@@ -1,4 +1,5 @@
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/BackendApplication.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/config/CorsConfig.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/config/RestTemplateConfig.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/config/WebSocketConfig.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/AnnonceController.java
@@ -117,4 +118,5 @@
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/service/ProviderService.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/service/UserService.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/service/VehicleService.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/service/WebSocketService.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/utils/SearchUtils.java

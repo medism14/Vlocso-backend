@@ -28,14 +28,16 @@ public class MessageService {
     private final ConversationService conversationService;
     private final UserService userService;
     private final ConversationRepository conversationRepository;
+    private final WebSocketService webSocketService;
 
     @Autowired
     public MessageService(MessageRepository messageRepository, ConversationService conversationService,
-            UserService userService, ConversationRepository conversationRepository) {
+            UserService userService, ConversationRepository conversationRepository, WebSocketService webSocketService) {
         this.messageRepository = messageRepository;
         this.conversationService = conversationService;
         this.userService = userService;
         this.conversationRepository = conversationRepository;
+        this.webSocketService = webSocketService;
     }
 
     @Transactional(readOnly = true)
@@ -201,6 +203,10 @@ public class MessageService {
                     savedMessage.getSender(),
                     savedMessage.getReceiver(),
                     savedMessage.getConversation().getConversationId());
+
+            // Notifier via WebSocket
+            webSocketService.notifyNewMessage(messageCreationDTO.getConversationId(), messageResponseDTO);
+
             response = new ResponseDTO<>(messageResponseDTO, "Message créé avec succès");
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {

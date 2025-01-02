@@ -1,28 +1,42 @@
 package com.vlosco.backend.handler;
 
-import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
-import org.springframework.stereotype.Component;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.stereotype.Controller;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+import com.vlosco.backend.dto.MessageResponseDTO;
 
-@Component
-public class MyWebSocketHandler extends TextWebSocketHandler {
+@Controller
+public class MyWebSocketHandler {
+    
+    private static final Logger logger = Logger.getLogger(MyWebSocketHandler.class.getName());
 
-    @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        System.out.println("Nouvelle connexion établie : " + session.getId());
-    }
+    @MessageMapping("/chat/{conversationId}")
+    @SendTo("/topic/conversation/{conversationId}")
+    public MessageResponseDTO handleChatMessage(@Payload MessageResponseDTO message, SimpMessageHeaderAccessor headerAccessor) {
+        try {
+            // Validation des données
+            if (message.getSender() == null || message.getContent() == null || message.getConversationId() == null) {
+                logger.warning("Message invalide reçu: données manquantes");
+                return null;
+            }
 
-    @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        System.out.println("Message reçu : " + message.getPayload());
-        // Réponse au client
-        session.sendMessage(new TextMessage("Message reçu : " + message.getPayload()));
-    }
+            // Nettoyer le contenu du message
+            String cleanContent = message.getContent().trim();
+            if (cleanContent.isEmpty()) {
+                logger.warning("Message vide reçu");
+                return null;
+            }
 
-    @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        System.out.println("Connexion fermée : " + session.getId());
+            logger.info("Message traité pour la conversation " + message.getConversationId());
+            return message;
+            
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Erreur lors du traitement du message", e);
+            return null;
+        }
     }
 }
