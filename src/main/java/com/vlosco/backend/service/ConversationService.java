@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 @Service
 public class ConversationService {
@@ -38,6 +39,9 @@ public class ConversationService {
     }
 
     private List<MessageResponseDTO> convertToMessageResponseDTOs(List<Message> messages) {
+        if (messages == null) {
+            return new ArrayList<>(); // Retourner une liste vide si messages est null
+        }
         return messages.stream()
             .map(message -> new MessageResponseDTO(
                 message.getMessageId(),
@@ -131,6 +135,7 @@ public class ConversationService {
             conversation.setBuyer(buyer);
             conversation.setActiveForBuyer(true);
             conversation.setActiveForVendor(true);
+            conversation.setMessages(new ArrayList<>());
 
             Conversation savedConversation = conversationRepository.save(conversation);
 
