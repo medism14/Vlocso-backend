@@ -25,4 +25,8 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     // Nouvelle méthode pour récupérer tous les messages d'un utilisateur
     @Query("SELECT m FROM Message m WHERE m.sender.id = :userId OR m.receiver.id = :userId ORDER BY m.createdAt DESC")
     List<Message> findAllMessagesForUser(@Param("userId") Long userId);
+
+    @Query("SELECT m FROM Message m WHERE m.conversation = :conversation AND m.receiver = :receiver AND m.readTime IS NULL")
+    List<Message> findByConversationAndReceiverAndReadTimeIsNull(@Param("conversation") Conversation conversation,
+            @Param("receiver") User receiver);
 }

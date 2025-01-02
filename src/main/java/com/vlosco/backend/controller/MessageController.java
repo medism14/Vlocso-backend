@@ -116,4 +116,21 @@ public class MessageController {
             @Parameter(description = "ID de l'utilisateur", required = true) @RequestParam Long userId) {
         return messageService.markMessageAsRead(id, userId);
     }
+
+    @Operation(summary = "Marquer tous les messages d'une conversation comme lus", 
+              description = "Marque tous les messages non lus d'une conversation comme lus pour un utilisateur spécifique")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Messages marqués comme lus avec succès"),
+        @ApiResponse(responseCode = "404", description = "Conversation non trouvée"),
+        @ApiResponse(responseCode = "403", description = "Non autorisé"),
+        @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
+    })
+    @PostMapping("/conversation/{conversationId}/read-all")
+    public ResponseEntity<ResponseDTO<List<MessageResponseDTO>>> markAllMessagesAsRead(
+        @Parameter(description = "ID de la conversation", required = true) 
+        @PathVariable Long conversationId,
+        @Parameter(description = "ID de l'utilisateur", required = true) 
+        @RequestParam Long userId) {
+        return messageService.markAllMessagesAsRead(conversationId, userId);
+    }
 }

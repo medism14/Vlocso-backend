@@ -3,6 +3,7 @@ package com.vlosco.backend.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -355,6 +356,64 @@ public class MessageService {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             response.setMessage("Erreur lors du marquage du message comme lu");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Transactional
+    public ResponseEntity<ResponseDTO<List<MessageResponseDTO>>> markAllMessagesAsRead(Long conversationId, Long userId) {
+        ResponseDTO<List<MessageResponseDTO>> response = new ResponseDTO<>();
+        try {
+            // Vérifier si l'utilisateur existe
+            ResponseDTO<User> userResponseDTO = userService.getUserById(userId).getBody();
+            if (userResponseDTO == null || userResponseDTO.getData() == null) {
+                response.setMessage("Utilisateur non trouvé");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+            User user = userResponseDTO.getData();
+
+            // Vérifier si la conversation existe
+            Optional<Conversation> conversationOpt = conversationRepository.findById(conversationId);
+            if (!conversationOpt.isPresent()) {
+                response.setMessage("Conversation non trouvée");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+            Conversation conversation = conversationOpt.get();
+
+            // Vérifier si la conversation est active pour l'utilisateur
+            if (!isConversationActiveForUser(conversation, user)) {
+                response.setMessage("Conversation inactive pour l'utilisateur");
+                return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+            }
+
+            // Récupérer tous les messages non lus où l'utilisateur est le destinataire
+            List<Message> unreadMessages = messageRepository.findByConversationAndReceiverAndReadTimeIsNull(
+                conversation, user);
+
+            LocalDateTime now = LocalDateTime.now();
+            List<MessageResponseDTO> updatedMessages = new ArrayList<>();
+
+            // Marquer chaque message comme lu
+            for (Message message : unreadMessages) {
+                message.setReadTime(now);
+                Message updatedMessage = messageRepository.save(message);
+                updatedMessages.add(new MessageResponseDTO(
+                    updatedMessage.getMessageId(),
+                    updatedMessage.getContent(),
+                    updatedMessage.getCreatedAt(),
+                    updatedMessage.getUpdatedAt(),
+                    updatedMessage.getReadTime(),
+                    updatedMessage.getSender(),
+                    updatedMessage.getReceiver(),
+                    updatedMessage.getConversation().getConversationId()
+                ));
+            }
+
+            response.setData(updatedMessages);
+            response.setMessage("Messages marqués comme lus avec succès");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setMessage("Erreur lors du marquage des messages comme lus");
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
