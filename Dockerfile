@@ -19,9 +19,18 @@ WORKDIR /app
 # Copier le JAR depuis l'étape de build
 COPY --from=build /app/target/*.jar app.jar
 
-# Exposer le port dynamiquement
-ENV PORT=8080
+# Configuration pour Render.com
+ENV SPRING_PROFILES_ACTIVE=prod
+ENV SERVER_ADDRESS=0.0.0.0
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
+
+# Le port sera fourni par Render via la variable d'environnement PORT
+ENV PORT=${PORT:-8080}
 EXPOSE ${PORT}
 
-# Script de démarrage
-ENTRYPOINT ["sh", "-c", "java -jar -Dserver.port=${PORT} app.jar"]
+# Healthcheck pour Render
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD curl -f http://localhost:${PORT}/ || exit 1
+
+# Script de démarrage optimisé pour Render
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar -Dserver.address=${SERVER_ADDRESS} -Dserver.port=${PORT} app.jar"]
