@@ -1,5 +1,6 @@
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/BackendApplication.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/config/RestTemplateConfig.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/config/WebSocketConfig.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/AnnonceController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/AnnonceFilterController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/AuthController.java
@@ -70,6 +71,7 @@
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/enums/TypeVehicle.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/enums/UserRole.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/enums/UserType.java
+/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/handler/MyWebSocketHandler.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/model/Annonce.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/model/AuthProvider.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/model/Conversation.java
