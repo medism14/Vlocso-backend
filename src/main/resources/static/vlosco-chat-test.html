@@ -84,7 +84,7 @@
                 return;
             }
 
-            const socket = new SockJS('http://localhost:8080/chat-vlocso');
+            const socket = new SockJS('https://vlocso-backend.onrender.com/chat-vlocso');
             stompClient = Stomp.over(socket);
 
             // Configuration des headers

@@ -16,24 +16,10 @@ public class MyWebSocketHandler {
 
     @MessageMapping("/chat/{conversationId}")
     @SendTo("/topic/conversation/{conversationId}")
-    public MessageResponseDTO handleChatMessage(@Payload MessageResponseDTO message, SimpMessageHeaderAccessor headerAccessor) {
+    public MessageResponseDTO handleChatMessage(@Payload MessageResponseDTO message) {
         try {
-            // Validation des données
-            if (message.getSender() == null || message.getContent() == null || message.getConversationId() == null) {
-                logger.warning("Message invalide reçu: données manquantes");
-                return null;
-            }
-
-            // Nettoyer le contenu du message
-            String cleanContent = message.getContent().trim();
-            if (cleanContent.isEmpty()) {
-                logger.warning("Message vide reçu");
-                return null;
-            }
-
-            logger.info("Message traité pour la conversation " + message.getConversationId());
+            logger.info("Message reçu pour la conversation " + message.getConversationId());
             return message;
-            
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Erreur lors du traitement du message", e);
             return null;
