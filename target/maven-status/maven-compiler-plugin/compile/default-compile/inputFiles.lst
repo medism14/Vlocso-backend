@@ -1,11 +1,9 @@
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/BackendApplication.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/config/RestTemplateConfig.java
-/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/config/WebSocketConfig.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/AnnonceController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/AnnonceFilterController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/AuthController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/AuthProviderController.java
-/Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/ChatController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/ConversationController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/HealthController.java
 /Users/medism14/Desktop/Dev/Vlocso/Backend/src/main/java/com/vlosco/backend/controller/ImageController.java

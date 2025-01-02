@@ -135,6 +135,7 @@ public class MessageService {
     public ResponseEntity<ResponseDTO<MessageResponseDTO>> createMessage(MessageCreationDTO messageCreationDTO,
             Long senderId) {
         ResponseDTO<MessageResponseDTO> response = new ResponseDTO<>();
+        System.out.println("ici");
         try {
             Long conversationId = messageCreationDTO.getConversationId();
             String content = messageCreationDTO.getContent();

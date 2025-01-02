@@ -70,7 +70,7 @@ public class MessageController {
     @PostMapping
     public ResponseEntity<ResponseDTO<MessageResponseDTO>> createMessage(
             @Parameter(description = "Données de création du message", required = true) @RequestBody MessageCreationDTO messageCreationDTO,
-            @Parameter(description = "ID de l'expéditeur", required = true) @RequestParam Long senderId) {
+            @Parameter(description = "ID de l'expéditeur", required = true) @RequestParam("senderId") Long senderId) {
         return messageService.createMessage(messageCreationDTO, senderId);
     }
 
