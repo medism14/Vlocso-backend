@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test WebSocket Vlosco</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        .container { 
+            max-width: 600px; 
+            margin: 20px auto; 
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .connection-panel {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        input, button {
+            padding: 8px;
+            margin: 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #ccc;
+        }
+        .logs {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Test WebSocket Vlosco</h2>
+        
+        <div class="connection-panel">
+            <div>
+                <input type="text" id="conversationId" placeholder="ID Conversation">
+                <button onclick="connect()">Connecter</button>
+                <button onclick="disconnect()">Déconnecter</button>
+            </div>
+        </div>
+
+        <div id="status" class="status"></div>
+        <div id="logs" class="logs"></div>
+    </div>
+
+    <script>
+        let stompClient = null;
+        const statusDiv = document.getElementById('status');
+        const logsDiv = document.getElementById('logs');
+
+        function addLog(message) {
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `${new Date().toLocaleTimeString()} - ${message}`;
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+
+        function connect() {
+            const conversationId = document.getElementById('conversationId').value;
+            if (!conversationId) {
+                updateStatus('Veuillez entrer un ID de conversation', 'error');
+                return;
+            }
+
+            const socket = new SockJS('http://localhost:8080/chat-vlocso');
+            stompClient = Stomp.over(socket);
+
+            // Configuration des headers
+            const headers = {
+                conversationId: conversationId
+            };
+
+            stompClient.debug = (str) => addLog(str);
+
+            stompClient.connect(headers, 
+                function(frame) {
+                    updateStatus('Connecté au serveur WebSocket', 'success');
+                    addLog(`Connecté à la conversation ${conversationId}`);
+
+                    // S'abonner au canal de la conversation
+                    const topic = `/topic/conversation/${conversationId}`;
+                    addLog(`Abonnement au canal: ${topic}`);
+                    
+                    stompClient.subscribe(topic, function(message) {
+                        addLog(`Message reçu sur ${topic}`);
+                    });
+                },
+                function(error) {
+                    addLog(`Erreur: ${error}`);
+                    updateStatus('Erreur de connexion: ' + error, 'error');
+                }
+            );
+        }
+
+        function disconnect() {
+            if (stompClient !== null) {
+                const conversationId = document.getElementById('conversationId').value;
+                stompClient.disconnect();
+                updateStatus('Déconnecté du serveur', 'success');
+                addLog(`Déconnecté de la conversation ${conversationId}`);
+            }
+        }
+
+        function updateStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+    </script>
+</body>
+</html>
